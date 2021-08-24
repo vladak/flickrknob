@@ -1,0 +1,121 @@
+#!/usr/bin/env python3
+
+"""
+
+TODO
+
+This is primarily meant for uploging JPEG files however it should work
+for any other format supported by Flickr.
+
+"""
+
+import os
+import logging
+
+import json
+
+import flickrapi
+import webbrowser
+import sys
+
+from FileObjWithCallback import FileObjWithCallback
+from alive_progress import alive_bar
+
+import xml.etree.ElementTree as ElementTree
+
+
+def report(bar, arg):
+    logger = logging.getLogger(__name__)
+    logger.debug("progress: {}".format(arg / 100))
+    bar(arg / 100)
+
+
+def upload_photo(flickr_handle, file_path, title=None, desc=None, tags=None,
+                 dedup=False):
+    """
+    Upload given file to Flickr. If title is not specified, it will be set
+    to the basename of the file path.
+
+    return photo ID or None.
+
+    Throws FlickrError on error.
+    """
+    res = None
+    logger = logging.getLogger(__name__)
+
+    logger.info("Uploading \"{0}\")".format(file_path))
+
+    params = {}
+    if title is None:
+        title = os.path.basename(file_path)
+
+    params['title'] = title
+
+    # With dedup_check = 1, uploaded photo can be detected as duplicate
+    # even though the duplicate was already deleted.
+    # The duplicate_photo_status tag will then say DELETED.
+    # With dedup_check = 2 it seems this will cause the deleted duplicate
+    # to be brought from the dead.
+    if dedup:
+        params['dedup_check'] = '2'
+
+    # TODO check if Flickr automatically adds description based on EXIF
+    if desc is not None:
+        params['description'] = desc
+    if tags is not None:
+        params['tags'] = tags
+
+    with open(file_path, 'rb') as fp:
+        with alive_bar(manual=True) as bar:
+            file_object = FileObjWithCallback(fp, report, bar)
+            try:
+                rsp = flickr_handle.upload(file_path, fileobj=file_object,
+                                           **params)
+                logger.debug(ElementTree.tostring(rsp, 'utf-8'))
+                photo_id = rsp.find('photoid')
+                if photo_id is not None:
+                    res = photo_id.text
+            except flickrapi.exceptions.FlickrError as e:
+                if dedup and e.code and e.code == 9:
+                    logger.info("Duplicate photo \"{}\"".format(file_path))
+                    # TODO: this needs a modification in flickrapi
+		    #       so that it creates FlickrError with the ElementTree.
+                    logger.debug(ElementTree.tostring(e.rsp, 'utf-8'))
+                    dup_id = e.rsp.find('duplicate_photo_id')
+                    logger.debug("dup_id = {}".format(dup_id))
+                    if dup_id is not None:
+                        logger.debug("Duplicate photo ID: {}".
+                                     format(dup_id.text))
+                        res = dup_id.text
+                else:
+                    raise e
+
+            # Finish the progress bar.
+            bar(1)
+
+    logger.info("Uploaded {0})".format(file_path))
+    return res
+
+
+def auth_check(flickr_handle, perms='read'):
+    """
+    TODO this should return/throw something
+    """
+
+    # Only do this if we don't have a valid token already
+    if not flickr_handle.token_valid(perms=perms):
+
+        # Get a request token
+        flickr_handle.get_request_token(oauth_callback='oob')
+
+        # Open a browser at the authentication URL. Do this however
+        # you want, as long as the user visits that URL.
+        authorize_url = flickr_handle.auth_url(perms=perms)
+        webbrowser.open_new_tab(authorize_url)
+
+        # Get the verifier code from the user. Do this however you
+        # want, as long as the user gives the application the code.
+        verifier = str(input('Verifier code: '))
+
+        # Trade the request token for an access token
+        flickr_handle.get_access_token(verifier)
