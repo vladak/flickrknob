@@ -18,6 +18,7 @@ import argparse
 import flickrapi
 
 from flickrknob import upload_photo, auth_check, create_album, get_album_names
+from photoutils import get_exif_date
 from utils import check_dir
 
 flickrKey = config('FLICKR_KEY')
@@ -65,18 +66,22 @@ if __name__ == "__main__":
         sys.exit(1)
 
     # Upload photos in the top level of the directory.
-    photo_ids = list()
-    # TODO: order photos according to date taken (will require EXIF reader)
-    #       otherwise they will appear in the album in the order uploaded.
     dir_name = args.sourceDir
-    dir_entries = [f for f in os.listdir(dir_name)
-                   if os.path.isfile(os.path.join(dir_name, f))]
+    # TODO: support more extenstions (videos)
+    dir_entries = [os.path.join(dir_name, f) for f in os.listdir(dir_name)
+                   if os.path.isfile(os.path.join(dir_name, f))
+                   and f.lower().endswith('.jpg')]
 
-    for file_name in dir_entries:
-        # TODO: check what happens if file cannot be read
+    # TODO: check what happens if file cannot be read
+    dir_entries.sort(key=get_exif_date)
+    logger.debug("Sorted files: {}".format(dir_entries))
+
+    photo_ids = list()
+    for file_path in dir_entries:
         # TODO: log the photo IDs to a file so that it is easier to
         #       recover if something fails during the process.
-        photo_id = upload_photo(flickr, os.path.join(dir_name, file_name),
+        file_name = os.path.basename(file_path)
+        photo_id = upload_photo(flickr, file_path,
                                 title=file_name, dedup=args.dedup)
         logger.info("Uploaded {} as {}".format(file_name, photo_id))
         photo_ids.append(photo_id)
