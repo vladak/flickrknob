@@ -8,6 +8,8 @@ cases, namely:
     photostream.
   - cannot upload videos
 
+In short, there is not enough knobs to turn for me, hence the main module is
+named `flickrknob`.
 
 ## Setup
 
