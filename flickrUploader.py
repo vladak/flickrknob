@@ -65,12 +65,14 @@ if __name__ == "__main__":
         sys.exit(1)
 
     # Upload photos in the top level of the directory.
-    # TODO: do not recurse
     photo_ids = list()
     # TODO: order photos according to date taken (will require EXIF reader)
     #       otherwise they will appear in the album in the order uploaded.
-    for dir_name, _, file_names in os.walk(args.sourceDir):
-        for file_name in file_names:
+    dir_name = args.sourceDir
+    dir_entries = [f for f in os.listdir(dir_name)
+                   if os.path.isfile(os.path.join(dir_name, f))]
+
+    for file_name in dir_entries:
             # TODO: check what happens if file cannot be read
             # TODO: log the photo IDs to a file so that it is easier to
             #       recover if something fails during the process.

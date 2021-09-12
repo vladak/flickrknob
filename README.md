@@ -35,5 +35,8 @@ Be sure you don't upload this folder or your `.env` file to a public repository.
 ## Run
 
 ```
-python flickrUploader.py
+./flickrUploader.py "album name" "photo directory"
 ```
+
+This will upload photos from the top level of the `photo directory` (i.e. does
+not recurse) and assign them to the newly created album with `album name`.
