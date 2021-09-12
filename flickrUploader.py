@@ -34,6 +34,7 @@ if __name__ == "__main__":
     parser.add_argument('sourceDir')
     args = parser.parse_args()
 
+    # TODO: avoid basicConfig() - only want to receive logs from my modules
     logging.basicConfig(level=logging.DEBUG) # TODO: make this configurable
     logger = logging.getLogger(__name__)
 
