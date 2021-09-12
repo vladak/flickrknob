@@ -17,7 +17,7 @@ import argparse
 
 import flickrapi
 
-from flickrknob import upload_photo, auth_check
+from flickrknob import upload_photo, auth_check, create_album, get_album_names
 from utils import check_dir
 
 flickrKey = config('FLICKR_KEY')
@@ -49,6 +49,22 @@ if __name__ == "__main__":
                                  # format='parsed-json')
     auth_check(flickr, perms='write')
 
+    #
+    # First check if album with same name exists. The create() API endpoint
+    # will create new album with the same name even though the name is already
+    # used so we want to avoid that. This check needs to be done first because
+    # in order to create an album, there needs to be at least one photo uploaded
+    # to be used as title photo.
+    #
+    album_names = get_album_names(flickr)
+    if album_names is None or len(album_names) == 0:
+        logger.error("Empty list of album names. Cannot check for dups.")
+        sys.exit(1)
+
+    if args.photoset in album_names:
+        logger.error("Duplicate album name: '{}'".format(args.photoset))
+        sys.exit(1)
+
     # Upload photos in the top level of the directory.
     # TODO: do not recurse
     photo_ids = list()
@@ -66,14 +82,11 @@ if __name__ == "__main__":
 
     logger.info("Uploaded {} photos".format(len(photo_ids)))
 
-    # TODO: check if album exists first. The API will create new album
-    #       with the same name even though the name is already used.
-    # The album creation needs primary photo ID.
-    res = flickr.photosets.create(title=args.photoset,
-                                  primary_photo_id=photo_ids[0])
-    album_id = res.find('photoset').attrib['id']
-    logger.info("Created album \"{}\" with ID {}".
-                format(args.photoset, album_id))
+    album_id = create_album(flickr,
+                            title=args.photoset,
+                            primary_photo_id=photo_ids[0])
+    if album_id is None:
+        sys.exit(1)
 
     # TODO add uploaded photos to the album
     for photo_id in photo_ids:
@@ -84,4 +97,3 @@ if __name__ == "__main__":
         logger.debug("Adding photo {} to album {}".
                      format(photo_id, album_id))
         flickr.photosets.addPhoto(photoset_id=album_id, photo_id=photo_id)
-

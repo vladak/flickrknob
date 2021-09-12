@@ -12,11 +12,8 @@ for any other format supported by Flickr.
 import os
 import logging
 
-import json
-
 import flickrapi
 import webbrowser
-import sys
 
 from FileObjWithCallback import FileObjWithCallback
 from alive_progress import alive_bar
@@ -28,6 +25,41 @@ def report(bar, arg):
     logger = logging.getLogger(__name__)
     logger.debug("progress: {}".format(arg / 100))
     bar(arg / 100)
+
+
+def get_album_names(flickr_handle):
+
+    logger = logging.getLogger(__name__)
+
+    ret = list()
+
+    # Note: paging is not used currently. According to the API documentation
+    #       this will return all photosets however this may change in the
+    #       future.
+    res = flickr_handle.photosets.getList()
+    photosets_elem = res.find('photosets')
+    for photoset_elem in list(photosets_elem.iter('photoset')):
+        logger.debug(ElementTree.tostring(photoset_elem, 'utf-8'))
+        title_elem = photoset_elem.find('title')
+        if title_elem is not None:
+            ret.append(title_elem.text)
+
+    return ret
+
+
+def create_album(flickr_handle, title, primary_photo_id):
+
+    logger = logging.getLogger(__name__)
+
+    # Note: The album creation needs primary photo ID.
+    res = flickr_handle.photosets.create(title=title,
+                                         primary_photo_id=primary_photo_id)
+    album_id = res.find('photoset').attrib['id']
+    if album_id is not None:
+        logger.info("Created album \"{}\" with ID {}".
+                    format(title, album_id))
+
+    return album_id
 
 
 def upload_photo(flickr_handle, file_path, title=None, desc=None, tags=None,
@@ -79,7 +111,8 @@ def upload_photo(flickr_handle, file_path, title=None, desc=None, tags=None,
                 if dedup and e.code and e.code == 9:
                     logger.info("Duplicate photo \"{}\"".format(file_path))
                     # TODO: this needs a modification in flickrapi
-		    #       so that it creates FlickrError with the ElementTree.
+                    #       so that it creates exception based on FlickrError
+                    #       that contains duplicate ID.
                     logger.debug(ElementTree.tostring(e.rsp, 'utf-8'))
                     dup_id = e.rsp.find('duplicate_photo_id')
                     logger.debug("dup_id = {}".format(dup_id))
