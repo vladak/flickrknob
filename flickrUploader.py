@@ -73,13 +73,13 @@ if __name__ == "__main__":
                    if os.path.isfile(os.path.join(dir_name, f))]
 
     for file_name in dir_entries:
-            # TODO: check what happens if file cannot be read
-            # TODO: log the photo IDs to a file so that it is easier to
-            #       recover if something fails during the process.
-            photo_id = upload_photo(flickr, os.path.join(dir_name, file_name),
-                                    title=file_name, dedup=args.dedup)
-            logger.info("Uploaded {} as {}".format(file_name, photo_id))
-            photo_ids.append(photo_id)
+        # TODO: check what happens if file cannot be read
+        # TODO: log the photo IDs to a file so that it is easier to
+        #       recover if something fails during the process.
+        photo_id = upload_photo(flickr, os.path.join(dir_name, file_name),
+                                title=file_name, dedup=args.dedup)
+        logger.info("Uploaded {} as {}".format(file_name, photo_id))
+        photo_ids.append(photo_id)
 
     logger.info("Uploaded {} photos".format(len(photo_ids)))
 

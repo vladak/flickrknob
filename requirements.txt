@@ -3,3 +3,4 @@ requests
 python-decouple
 alive-progress
 flake8
+pillow==8.3.2
