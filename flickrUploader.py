@@ -33,7 +33,7 @@ if __name__ == "__main__":
     parser.add_argument('sourceDir')
     args = parser.parse_args()
 
-    logging.basicConfig(level=logging.DEBUG) # TODO
+    logging.basicConfig(level=logging.DEBUG) # TODO: make this configurable
     logger = logging.getLogger(__name__)
 
     check_dir(args.sourceDir)
@@ -46,7 +46,6 @@ if __name__ == "__main__":
         sys.exit(1)
 
     flickr = flickrapi.FlickrAPI(flickrKey, flickrSecret)
-                                 # format='parsed-json')
     auth_check(flickr, perms='write')
 
     #
