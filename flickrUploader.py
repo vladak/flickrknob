@@ -55,8 +55,8 @@ if __name__ == "__main__":
     # First check if album with same name exists. The create() API endpoint
     # will create new album with the same name even though the name is already
     # used so we want to avoid that. This check needs to be done first because
-    # in order to create an album, there needs to be at least one photo uploaded
-    # to be used as title photo.
+    # in order to create an album, there needs to be at least one photo
+    # uploaded to be used as title photo.
     #
     album_names = get_album_names(flickr)
     if album_names is None or len(album_names) == 0:
@@ -81,7 +81,7 @@ if __name__ == "__main__":
     logger.debug("Sorted files: {}".format(dir_entries))
 
     logger.info("Uploading {} photos".format(len(dir_entries)))
-    photo_ids = list()
+    photo_ids = {}
     with alive_bar(len(dir_entries)) as bar:
         for file_path in dir_entries:
             # TODO: log the photo IDs to a file so that it is easier to
@@ -90,7 +90,7 @@ if __name__ == "__main__":
             photo_id = upload_photo(flickr, file_path,
                                     title=file_name, dedup=args.dedup)
             logger.info("Uploaded {} as {}".format(file_name, photo_id))
-            photo_ids.append(photo_id)
+            photo_ids[file_name] = photo_id
             bar()
 
     logger.info("Uploaded {} photos".format(len(photo_ids)))
@@ -99,15 +99,16 @@ if __name__ == "__main__":
                             title=args.photoset,
                             primary_photo_id=photo_ids[0])
     if album_id is None:
-        # TODO: log the photo IDs here ?
+        logger.error("Failed to created album '{}'".format(args.photoset))
         sys.exit(1)
 
-    # TODO add uploaded photos to the album
-    for photo_id in photo_ids:
-        # Primary photo was automatically added to the album.
+    logger.info("Adding photos to album '{}' ({})".
+                format(args.photoset, album_id))
+    for name, photo_id in photo_ids.items():
+        # Primary photo was automatically added to the album so skip it.
         if photo_id == photo_ids[0]:
             continue
 
-        logger.debug("Adding photo {} to album {}".
-                     format(photo_id, album_id))
+        logger.debug("Adding photo '{}' ({}) to album {}".
+                     format(name, photo_id, album_id))
         flickr.photosets.addPhoto(photoset_id=album_id, photo_id=photo_id)
