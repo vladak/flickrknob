@@ -15,9 +15,6 @@ import logging
 import flickrapi
 import webbrowser
 
-from FileObjWithCallback import FileObjWithCallback
-from alive_progress import alive_bar
-
 import xml.etree.ElementTree as ElementTree
 
 
@@ -51,12 +48,13 @@ def create_album(flickr_handle, title, primary_photo_id):
 
     logger = logging.getLogger(__name__)
 
+    logger.info("Creating album '{}'".format(title))
     # Note: The album creation needs primary photo ID.
     res = flickr_handle.photosets.create(title=title,
                                          primary_photo_id=primary_photo_id)
     album_id = res.find('photoset').attrib['id']
     if album_id is not None:
-        logger.info("Created album \"{}\" with ID {}".
+        logger.info("Created album '{}' with ID {}".
                     format(title, album_id))
 
     return album_id
@@ -98,33 +96,28 @@ def upload_photo(flickr_handle, file_path, title=None, desc=None, tags=None,
         params['tags'] = tags
 
     with open(file_path, 'rb') as fp:
-        with alive_bar(manual=True) as bar:
-            file_object = FileObjWithCallback(fp, report, bar)
-            try:
-                rsp = flickr_handle.upload(file_path, fileobj=file_object,
-                                           **params)
-                logger.debug(ElementTree.tostring(rsp, 'utf-8'))
-                photo_id = rsp.find('photoid')
-                if photo_id is not None:
-                    res = photo_id.text
-            except flickrapi.exceptions.FlickrError as e:
-                if dedup and e.code and e.code == 9:
-                    logger.info("Duplicate photo \"{}\"".format(file_path))
-                    # TODO: this needs a modification in flickrapi
-                    #       so that it creates exception based on FlickrError
-                    #       that contains duplicate ID.
-                    logger.debug(ElementTree.tostring(e.rsp, 'utf-8'))
-                    dup_id = e.rsp.find('duplicate_photo_id')
-                    logger.debug("dup_id = {}".format(dup_id))
-                    if dup_id is not None:
-                        logger.debug("Duplicate photo ID: {}".
-                                     format(dup_id.text))
-                        res = dup_id.text
-                else:
-                    raise e
-
-            # Finish the progress bar.
-            bar(1)
+        try:
+            rsp = flickr_handle.upload(file_path, fileobj=fp,
+                                       **params)
+            logger.debug(ElementTree.tostring(rsp, 'utf-8'))
+            photo_id = rsp.find('photoid')
+            if photo_id is not None:
+                res = photo_id.text
+        except flickrapi.exceptions.FlickrError as e:
+            if dedup and e.code and e.code == 9:
+                logger.info("Duplicate photo \"{}\"".format(file_path))
+                # TODO: this needs a modification in flickrapi
+                #       so that it creates exception based on FlickrError
+                #       that contains duplicate ID.
+                logger.debug(ElementTree.tostring(e.rsp, 'utf-8'))
+                dup_id = e.rsp.find('duplicate_photo_id')
+                logger.debug("dup_id = {}".format(dup_id))
+                if dup_id is not None:
+                    logger.debug("Duplicate photo ID: {}".
+                                 format(dup_id.text))
+                    res = dup_id.text
+            else:
+                raise e
 
     logger.info("Uploaded {0})".format(file_path))
     return res

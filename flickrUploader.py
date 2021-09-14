@@ -16,6 +16,7 @@ import logging
 import argparse
 
 import flickrapi
+from alive_progress import alive_bar
 
 from flickrknob import upload_photo, auth_check, create_album, get_album_names
 from photoutils import get_exif_date, is_known_suffix
@@ -69,23 +70,28 @@ if __name__ == "__main__":
     # Upload photos in the top level of the directory.
     dir_name = args.sourceDir
     # TODO: support more extenstions (videos)
+    logger.info("Getting list of photo files from '{}'".format(dir_name))
     dir_entries = [os.path.join(dir_name, f) for f in os.listdir(dir_name)
                    if os.path.isfile(os.path.join(dir_name, f))
                    and is_known_suffix(f)]
 
     # TODO: check what happens if file cannot be read or lacks EXIF data
+    logger.info("Sorting photo files")
     dir_entries.sort(key=get_exif_date)
     logger.debug("Sorted files: {}".format(dir_entries))
 
+    logger.info("Uploading {} photos".format(len(dir_entries)))
     photo_ids = list()
-    for file_path in dir_entries:
-        # TODO: log the photo IDs to a file so that it is easier to
-        #       recover if something fails during the process.
-        file_name = os.path.basename(file_path)
-        photo_id = upload_photo(flickr, file_path,
-                                title=file_name, dedup=args.dedup)
-        logger.info("Uploaded {} as {}".format(file_name, photo_id))
-        photo_ids.append(photo_id)
+    with alive_bar(len(dir_entries)) as bar:
+        for file_path in dir_entries:
+            # TODO: log the photo IDs to a file so that it is easier to
+            #       recover if something fails during the process.
+            file_name = os.path.basename(file_path)
+            photo_id = upload_photo(flickr, file_path,
+                                    title=file_name, dedup=args.dedup)
+            logger.info("Uploaded {} as {}".format(file_name, photo_id))
+            photo_ids.append(photo_id)
+            bar()
 
     logger.info("Uploaded {} photos".format(len(photo_ids)))
 
@@ -93,6 +99,7 @@ if __name__ == "__main__":
                             title=args.photoset,
                             primary_photo_id=photo_ids[0])
     if album_id is None:
+        # TODO: log the photo IDs here ?
         sys.exit(1)
 
     # TODO add uploaded photos to the album
