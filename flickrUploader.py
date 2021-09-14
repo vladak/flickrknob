@@ -104,11 +104,13 @@ if __name__ == "__main__":
 
     logger.info("Adding photos to album '{}' ({})".
                 format(args.photoset, album_id))
-    for name, photo_id in photo_ids.items():
-        # Primary photo was automatically added to the album so skip it.
-        if photo_id == photo_ids[0]:
-            continue
+    with alive_bar(len(photo_ids.keys()) - 1) as bar:
+        for name, photo_id in photo_ids.items():
+            # Primary photo was automatically added to the album so skip it.
+            if photo_id == photo_ids[0]:
+                continue
 
-        logger.debug("Adding photo '{}' ({}) to album {}".
-                     format(name, photo_id, album_id))
-        flickr.photosets.addPhoto(photoset_id=album_id, photo_id=photo_id)
+            logger.debug("Adding photo '{}' ({}) to album {}".
+                         format(name, photo_id, album_id))
+            flickr.photosets.addPhoto(photoset_id=album_id, photo_id=photo_id)
+            bar()
