@@ -18,7 +18,7 @@ import argparse
 import flickrapi
 
 from flickrknob import upload_photo, auth_check, create_album, get_album_names
-from photoutils import get_exif_date
+from photoutils import get_exif_date, is_known_suffix
 from utils import check_dir
 
 flickrKey = config('FLICKR_KEY')
@@ -71,9 +71,9 @@ if __name__ == "__main__":
     # TODO: support more extenstions (videos)
     dir_entries = [os.path.join(dir_name, f) for f in os.listdir(dir_name)
                    if os.path.isfile(os.path.join(dir_name, f))
-                   and f.lower().endswith('.jpg')]
+                   and is_known_suffix(f)]
 
-    # TODO: check what happens if file cannot be read
+    # TODO: check what happens if file cannot be read or lacks EXIF data
     dir_entries.sort(key=get_exif_date)
     logger.debug("Sorted files: {}".format(dir_entries))
 
