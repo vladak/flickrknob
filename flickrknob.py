@@ -48,7 +48,8 @@ def create_album(flickr_handle, title, primary_photo_id):
 
     logger = logging.getLogger(__name__)
 
-    logger.info("Creating album '{}'".format(title))
+    logger.info("Creating album '{}' with primary photo {}".
+                format(title, primary_photo_id))
     # Note: The album creation needs primary photo ID.
     res = flickr_handle.photosets.create(title=title,
                                          primary_photo_id=primary_photo_id)

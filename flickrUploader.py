@@ -82,6 +82,7 @@ if __name__ == "__main__":
 
     logger.info("Uploading {} photos".format(len(dir_entries)))
     photo_ids = {}
+    primary_photo_id = None
     with alive_bar(len(dir_entries)) as bar:
         for file_path in dir_entries:
             # TODO: log the photo IDs to a file so that it is easier to
@@ -91,13 +92,15 @@ if __name__ == "__main__":
                                     title=file_name, dedup=args.dedup)
             logger.info("Uploaded {} as {}".format(file_name, photo_id))
             photo_ids[file_name] = photo_id
+            if primary_photo_id is None:
+                primary_photo_id = photo_id
             bar()
 
     logger.info("Uploaded {} photos".format(len(photo_ids)))
 
     album_id = create_album(flickr,
                             title=args.photoset,
-                            primary_photo_id=photo_ids[0])
+                            primary_photo_id=primary_photo_id)
     if album_id is None:
         logger.error("Failed to created album '{}'".format(args.photoset))
         sys.exit(1)
@@ -107,7 +110,7 @@ if __name__ == "__main__":
     with alive_bar(len(photo_ids.keys()) - 1) as bar:
         for name, photo_id in photo_ids.items():
             # Primary photo was automatically added to the album so skip it.
-            if photo_id == photo_ids[0]:
+            if photo_id == primary_photo_id:
                 continue
 
             logger.debug("Adding photo '{}' ({}) to album {}".
