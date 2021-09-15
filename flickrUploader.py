@@ -21,6 +21,7 @@ from alive_progress import alive_bar
 from flickrknob import upload_photo, auth_check, create_album, get_album_names
 from photoutils import get_exif_date, is_known_suffix
 from utils import check_dir
+from logutil import LogLevelAction
 
 flickrKey = config('FLICKR_KEY')
 flickrSecret = config('FLICKR_SECRET')
@@ -30,13 +31,16 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='yet another flickr uploader')
     parser.add_argument('-D', '--dedup', action='store_true', default=False,
                         help='deduplicate photos')
+    parser.add_argument('-l', '--loglevel', action=LogLevelAction,
+                        help='Set log level (e.g. \"ERROR\")',
+                        default=logging.INFO)
 
     parser.add_argument('photoset')
     parser.add_argument('sourceDir')
     args = parser.parse_args()
 
     # TODO: avoid basicConfig() - only want to receive logs from my modules
-    logging.basicConfig(level=logging.DEBUG) # TODO: make this configurable
+    logging.basicConfig(level=args.loglevel)
     logger = logging.getLogger(__name__)
 
     check_dir(args.sourceDir)
