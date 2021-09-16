@@ -101,7 +101,7 @@ def uploader():
             file_name = os.path.basename(file_path)
             photo_id = upload_photo(flickr, file_path,
                                     title=file_name, dedup=args.dedup)
-            logger.info("Uploaded {} as {}".format(file_name, photo_id))
+            logger.debug("Uploaded {} as {}".format(file_name, photo_id))
             photo_ids[file_name] = photo_id
             if primary_photo_id is None:
                 primary_photo_id = photo_id
