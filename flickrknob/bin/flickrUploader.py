@@ -18,17 +18,17 @@ import argparse
 import flickrapi
 from alive_progress import alive_bar
 
-from flickrknob import upload_photo, auth_check, create_album, get_album_names
-from photoutils import get_exif_date, is_known_suffix
-from utils import check_dir
-from logutil import LogLevelAction
+from flickrknob.flickrknob import upload_photo, auth_check, create_album, get_album_names
+from flickrknob.photoutils import get_exif_date, is_known_suffix
+from flickrknob.utils import check_dir
+from flickrknob.logutil import LogLevelAction
 
 flickrKey = config('FLICKR_KEY')
 flickrSecret = config('FLICKR_SECRET')
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='yet another flickr uploader')
+    parser = argparse.ArgumentParser(description='yet another Flickr uploader')
     parser.add_argument('-D', '--dedup', action='store_true', default=False,
                         help='deduplicate photos')
     parser.add_argument('-l', '--loglevel', action=LogLevelAction,
