@@ -18,16 +18,16 @@ import argparse
 import flickrapi
 from alive_progress import alive_bar
 
-from flickrknob.flickrknob import upload_photo, auth_check, create_album, get_album_names
-from flickrknob.photoutils import get_exif_date, is_known_suffix
-from flickrknob.utils import check_dir
-from flickrknob.logutil import LogLevelAction
+from .flickrknob import upload_photo, auth_check, create_album, get_album_names
+from .photoutils import get_exif_date, is_known_suffix
+from .utils import check_dir
+from .logutil import LogLevelAction
 
 flickrKey = config('FLICKR_KEY')
 flickrSecret = config('FLICKR_SECRET')
 
 
-if __name__ == "__main__":
+def uploader():
     parser = argparse.ArgumentParser(description='yet another Flickr uploader')
     parser.add_argument('-D', '--dedup', action='store_true', default=False,
                         help='deduplicate photos')
@@ -53,6 +53,7 @@ if __name__ == "__main__":
         print("Missing Flickr secret")
         sys.exit(1)
 
+    logger.info("Checking authentication")
     flickr = flickrapi.FlickrAPI(flickrKey, flickrSecret)
     auth_check(flickr, perms='write')
 
@@ -63,6 +64,7 @@ if __name__ == "__main__":
     # in order to create an album, there needs to be at least one photo
     # uploaded to be used as title photo.
     #
+    logger.info("Checking album name")
     album_names = get_album_names(flickr)
     if album_names is None or len(album_names) == 0:
         logger.error("Empty list of album names. Cannot check for dups.")
