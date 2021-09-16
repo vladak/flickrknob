@@ -37,7 +37,11 @@ def uploader():
 
     parser.add_argument('photoset')
     parser.add_argument('sourceDir')
-    args = parser.parse_args()
+    try:
+        args = parser.parse_args()
+    except ValueError as e:
+        print("Argument parsing failed: {}".format(e), file=sys.stderr)
+        sys.exit(1)
 
     logger = logging.getLogger(__package__)
     logger.setLevel(args.loglevel)
