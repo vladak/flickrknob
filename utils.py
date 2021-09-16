@@ -10,6 +10,8 @@ def check_dir(name):
 
     logger = logging.getLogger(__name__)
 
+    logger.debug("Checking if '{}' is directory".format(name))
+
     if not os.path.isdir(name):
         logger.critical("{} is not a directory".format(name))
         sys.exit(1)
