@@ -120,7 +120,7 @@ def upload_photo(flickr_handle, file_path, title=None, desc=None, tags=None,
             else:
                 raise e
 
-    logger.info("Uploaded {0})".format(file_path))
+    logger.debug("Uploaded {0})".format(file_path))
     return res
 
 
