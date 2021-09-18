@@ -80,18 +80,17 @@ def uploader():
 
     # Upload photos in the top level of the directory.
     dir_name = args.sourceDir
-    # TODO: support more extenstions (videos)
-    logger.info("Getting list of photo files from '{}'".format(dir_name))
+    logger.info("Getting list of files from '{}'".format(dir_name))
     dir_entries = [os.path.join(dir_name, f) for f in os.listdir(dir_name)
                    if os.path.isfile(os.path.join(dir_name, f))
                    and is_known_suffix(f)]
 
     # TODO: check what happens if file cannot be read or lacks EXIF data
-    logger.info("Sorting photo files")
+    logger.info("Sorting files")
     dir_entries.sort(key=get_exif_date)
     logger.debug("Sorted files: {}".format(dir_entries))
 
-    logger.info("Uploading {} photos".format(len(dir_entries)))
+    logger.info("Uploading {} files".format(len(dir_entries)))
     photo_ids = {}
     primary_photo_id = None
     with alive_bar(len(dir_entries)) as bar:
@@ -106,7 +105,7 @@ def uploader():
                 primary_photo_id = photo_id
             bar()
 
-    logger.info("Uploaded {} photos".format(len(photo_ids)))
+    logger.info("Uploaded {} files".format(len(photo_ids)))
 
     album_id = create_album(flickr,
                             title=args.photoset,
@@ -115,7 +114,7 @@ def uploader():
         logger.error("Failed to created album '{}'".format(args.photoset))
         sys.exit(1)
 
-    logger.info("Adding photos to album '{}' ({})".
+    logger.info("Adding files to album '{}' ({})".
                 format(args.photoset, album_id))
     with alive_bar(len(photo_ids.keys()) - 1) as bar:
         for name, photo_id in photo_ids.items():
@@ -123,7 +122,7 @@ def uploader():
             if photo_id == primary_photo_id:
                 continue
 
-            logger.debug("Adding photo '{}' ({}) to album {}".
+            logger.debug("Adding file '{}' ({}) to album {}".
                          format(name, photo_id, album_id))
             flickr.photosets.addPhoto(photoset_id=album_id, photo_id=photo_id)
             bar()
