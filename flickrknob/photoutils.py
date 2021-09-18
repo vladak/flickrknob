@@ -27,5 +27,7 @@ def get_exif_date(file_path):
 
 def is_known_suffix(file_name):
     file_name = file_name.lower()
+    dot_index = file_name.rindex('.')
+    extension = file_name[dot_index+1:]
 
-    return file_name.endswith('.jpg')
+    return extension in ['jpg', 'jpeg', 'mov', 'mp4']
