@@ -18,7 +18,7 @@ import argparse
 import flickrapi
 from alive_progress import alive_bar
 
-from .flickrknob import upload_photo, auth_check, create_album, get_album_names
+from .flickrknob import upload_photo, auth_check, create_album, get_albums
 from .photoutils import get_exif_date, is_known_suffix
 from .utils import check_dir
 from .logutil import LogLevelAction
@@ -69,10 +69,13 @@ def uploader():
     # uploaded to be used as title photo.
     #
     logger.info("Checking album name")
-    album_names = get_album_names(flickr)
-    if album_names is None or len(album_names) == 0:
-        logger.error("Empty list of album names. Cannot check for dups.")
+    albums = get_albums(flickr)
+    logger.debug("Albums: {}".format(albums))
+    if albums is None or len(albums.items()) == 0:
+        logger.error("Empty list of albums. Cannot check for dups.")
         sys.exit(1)
+
+    album_names = albums.keys()
 
     if args.photoset in album_names:
         logger.error("Duplicate album name: '{}'".format(args.photoset))

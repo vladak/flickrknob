@@ -24,11 +24,14 @@ def report(bar, arg):
     bar(arg / 100)
 
 
-def get_album_names(flickr_handle):
+def get_albums(flickr_handle):
+    """
+    Return dictionary of albums. Names map to IDs.
+    """
 
     logger = logging.getLogger(__name__)
 
-    ret = list()
+    ret = dict()
 
     # Note: paging is not used currently. According to the API documentation
     #       this will return all photosets however this may change in the
@@ -39,7 +42,7 @@ def get_album_names(flickr_handle):
         logger.debug(ElementTree.tostring(photoset_elem, 'utf-8'))
         title_elem = photoset_elem.find('title')
         if title_elem is not None:
-            ret.append(title_elem.text)
+            ret[title_elem.text] = photoset_elem.attrib['id']
 
     return ret
 
