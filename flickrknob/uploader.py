@@ -111,7 +111,7 @@ def uploader():
                             title=args.photoset,
                             primary_photo_id=primary_photo_id)
     if album_id is None:
-        logger.error("Failed to created album '{}'".format(args.photoset))
+        logger.error("Failed to create album '{}'".format(args.photoset))
         sys.exit(1)
 
     logger.info("Adding files to album '{}' ({})".
