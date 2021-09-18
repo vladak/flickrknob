@@ -138,7 +138,7 @@ def delete_album(flickr_handle, album_id):
 
 def auth_check(flickr_handle, perms='read'):
     """
-    TODO this should return/throw something
+    TODO this should return/throw something in case of failure
     """
 
     # Only do this if we don't have a valid token already
