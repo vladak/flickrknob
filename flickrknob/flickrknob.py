@@ -2,8 +2,6 @@
 
 """
 
-TODO
-
 This is primarily meant for uploging JPEG files however it should work
 for any other format supported by Flickr.
 
@@ -64,13 +62,15 @@ def create_album(flickr_handle, title, primary_photo_id):
     return album_id
 
 
-def upload_photo(flickr_handle, file_path, title=None, desc=None, tags=None,
-                 dedup=False):
+def upload_photo(flickr_handle, file_path, title=None, description=None,
+                 tags=None, dedup=False):
     """
     Upload given file to Flickr. If title is not specified, it will be set
     to the basename of the file path.
 
     return photo ID or None.
+
+    Note that Flickr automatically adds description based on EXIF data.
 
     Throws FlickrError on error.
     """
@@ -93,9 +93,8 @@ def upload_photo(flickr_handle, file_path, title=None, desc=None, tags=None,
     if dedup:
         params['dedup_check'] = '2'
 
-    # TODO check if Flickr automatically adds description based on EXIF
-    if desc is not None:
-        params['description'] = desc
+    if description is not None:
+        params['description'] = description
     if tags is not None:
         params['tags'] = tags
 
