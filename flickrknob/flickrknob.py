@@ -2,8 +2,7 @@
 
 """
 
-This is primarily meant for uploging JPEG files however it should work
-for any other format supported by Flickr.
+Functions that wrap around Flickr API
 
 """
 
