@@ -104,21 +104,10 @@ def upload_photo(flickr_handle, file_path, title=None, desc=None, tags=None,
             photo_id = rsp.find('photoid')
             if photo_id is not None:
                 res = photo_id.text
-        except flickrapi.exceptions.FlickrError as e:
-            if dedup and e.code and e.code == 9:
-                logger.info("Duplicate photo \"{}\"".format(file_path))
-                # TODO: this needs a modification in flickrapi
-                #       so that it creates exception based on FlickrError
-                #       that contains duplicate ID.
-                logger.debug(ElementTree.tostring(e.rsp, 'utf-8'))
-                dup_id = e.rsp.find('duplicate_photo_id')
-                logger.debug("dup_id = {}".format(dup_id))
-                if dup_id is not None:
-                    logger.debug("Duplicate photo ID: {}".
-                                 format(dup_id.text))
-                    res = dup_id.text
-            else:
-                raise e
+        except flickrapi.exceptions.FlickrDuplicate as e:
+            logger.info("Duplicate photo '{}' with ID {}".
+	                format(file_path, e.duplicate_photo_id))
+            res = e.duplicate_photo_id
 
     logger.debug("Uploaded '{}' as {}".format(file_path, res))
     return res
