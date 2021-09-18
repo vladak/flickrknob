@@ -106,7 +106,7 @@ def upload_photo(flickr_handle, file_path, title=None, desc=None, tags=None,
                 res = photo_id.text
         except flickrapi.exceptions.FlickrDuplicate as e:
             logger.info("Duplicate photo '{}' with ID {}".
-	                format(file_path, e.duplicate_photo_id))
+                        format(file_path, e.duplicate_photo_id))
             res = e.duplicate_photo_id
 
     logger.debug("Uploaded '{}' as {}".format(file_path, res))
