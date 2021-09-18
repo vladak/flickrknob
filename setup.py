@@ -8,7 +8,8 @@ setup(name='flickrknob',
       author_email='vlada@devnull.cz',
       # list folders, not files
       packages=['flickrknob'],
-      scripts=['flickrknob/bin/flickrUploader.py'],
+      scripts=['flickrknob/bin/flickrUploader.py',
+               'flickrknob/bin/delete_album.py'],
       install_requires=[
         'flickrapi',
         'requests',

@@ -116,6 +116,26 @@ def upload_photo(flickr_handle, file_path, title=None, desc=None, tags=None,
     return res
 
 
+def delete_photo(flickr_handle, photo_id):
+    """
+    Delete photo.
+    """
+    logger = logging.getLogger(__name__)
+
+    logger.debug("Deleting file with photo ID {})".format(photo_id))
+    flickr_handle.photos.delete(photo_id=photo_id)
+
+
+def delete_album(flickr_handle, album_id):
+    """
+    Delete album
+    """
+    logger = logging.getLogger(__name__)
+
+    logger.debug("Deleting album with ID {})".format(album_id))
+    flickr_handle.photosets.delete(photoset_id=album_id)
+
+
 def auth_check(flickr_handle, perms='read'):
     """
     TODO this should return/throw something
