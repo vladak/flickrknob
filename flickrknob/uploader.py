@@ -13,7 +13,7 @@ from decouple import config
 import logging
 import argparse
 
-import flickrapi
+from flickrapi import FlickrAPI, FlickrError
 from alive_progress import alive_bar
 
 from .flickrknob import upload_photo, auth_check, create_album, get_albums
@@ -56,7 +56,7 @@ def uploader():
         sys.exit(1)
 
     logger.info("Checking authentication")
-    flickr = flickrapi.FlickrAPI(flickrKey, flickrSecret)
+    flickr = FlickrAPI(flickrKey, flickrSecret)
     auth_check(flickr, perms='write')
 
     #
@@ -86,6 +86,8 @@ def uploader():
                    if os.path.isfile(os.path.join(dir_name, f))
                    and is_known_suffix(f)]
 
+    # This serves also as prevention for file related problems in the upload
+    # phase (except this is still a TOCTOU problem).
     logger.info("Sorting files")
     try:
         dir_entries.sort(key=get_exif_date)
@@ -102,8 +104,13 @@ def uploader():
             # TODO: log the photo IDs to a file so that it is easier to
             #       recover if something fails during the process.
             file_name = os.path.basename(file_path)
-            photo_id = upload_photo(flickr, file_path,
-                                    title=file_name, dedup=args.dedup)
+            try:
+                photo_id = upload_photo(flickr, file_path,
+                                        title=file_name, dedup=args.dedup)
+            except FlickrError as e:
+                logger.error(e)
+                continue
+
             photo_ids[file_name] = photo_id
             if primary_photo_id is None:
                 primary_photo_id = photo_id
