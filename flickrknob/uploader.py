@@ -17,7 +17,7 @@ import flickrapi
 from alive_progress import alive_bar
 
 from .flickrknob import upload_photo, auth_check, create_album, get_albums
-from .photoutils import get_exif_date, is_known_suffix
+from .photoutils import get_exif_date, is_known_suffix, EXIFerror
 from .utils import check_dir
 from .logutil import LogLevelAction
 
@@ -88,7 +88,11 @@ def uploader():
 
     # TODO: check what happens if file cannot be read or lacks EXIF data
     logger.info("Sorting files")
-    dir_entries.sort(key=get_exif_date)
+    try:
+        dir_entries.sort(key=get_exif_date)
+    except EXIFerror as e:
+        logger.error(e)
+        sys.exit(1)
     logger.debug("Sorted files: {}".format(dir_entries))
 
     logger.info("Uploading {} files".format(len(dir_entries)))

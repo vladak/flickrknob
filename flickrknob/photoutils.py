@@ -4,6 +4,11 @@ from datetime import datetime
 import exifread
 
 
+class EXIFerror(Exception):
+    def __init__(self, msg):
+        super().__init__(self, msg)
+
+
 def get_exif_date(file_path):
     """
     Read EXIF data from given file and return datetime.datetime object
@@ -14,15 +19,30 @@ def get_exif_date(file_path):
 
     logger.debug("Getting EXIF tags for '{}'".format(file_path))
 
-    with open(file_path, 'rb') as f:
-        tags = exifread.process_file(f, stop_tag='DateTimeOriginal')
-        date_original = tags['EXIF DateTimeOriginal']
-        if date_original:
-            date_obj = datetime.strptime(str(date_original),
-                                         '%Y:%m:%d %H:%M:%S')
-            return date_obj
+    tag_name = 'DateTimeOriginal'
+    try:
+        with open(file_path, 'rb') as f:
+            tags = exifread.process_file(f, stop_tag=tag_name)
+            try:
+                date_original = tags['EXIF ' + tag_name]
+            except KeyError:
+                raise EXIFerror("File '{}' lacks EXIF {} tag".
+                                format(file_path, tag_name))
 
-    return None
+            if date_original:
+                try:
+                    date_obj = datetime.strptime(str(date_original),
+                                                 '%Y:%m:%d %H:%M:%S')
+                    return date_obj
+                except ValueError:
+                    raise EXIFerror("{} tag not correctly formed for '{}'".
+                                    format(tag_name, file_path))
+    except PermissionError as e:
+        raise EXIFerror("Permissing problem for '{}': {}".
+                        format(file_path, e))
+
+    raise EXIFerror("cannot find {} in '{}'".
+                    format(tag_name, file_path))
 
 
 def is_known_suffix(file_name):
