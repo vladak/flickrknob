@@ -66,7 +66,7 @@ def delete_album_with_photos():
         logger.error("Did not find album with name '{}'".format(args.name))
         sys.exit(1)
 
-    # TODO get list of photos in the album (so that progress can be displayed)
+    # Get list of photos in the album. (so that progress can be displayed)
     logger.info("Getting photo IDs")
     res = flickr.photosets.getPhotos(photoset_id=album_id)
     photoset_elem = res.find('photoset')
