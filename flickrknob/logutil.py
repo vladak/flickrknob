@@ -20,6 +20,8 @@
 import logging
 import argparse
 
+from .utils import create_trunc
+
 
 class LogLevelAction(argparse.Action):
     """
@@ -65,3 +67,26 @@ def get_log_level(level):
             return None
     except AttributeError:
         return None
+
+
+def get_file_logger(logfile, logger_name):
+    """
+    Create logger that logs to the specified file.
+    The file is created and truncated.
+    The logger is set so that events do not propagate to the ancestors.
+    """
+
+    logger = logging.getLogger(__name__)
+
+    try:
+        create_trunc(logfile)
+    except OSError as e:
+        logger.error(e)
+        return None
+    file_logger = logging.getLogger(logger_name)
+    file_logger.propagate = False
+    logger.setLevel(logging.INFO)
+    handler = logging.FileHandler(logfile)
+    file_logger.addHandler(handler)
+
+    return file_logger

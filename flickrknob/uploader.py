@@ -19,7 +19,7 @@ from alive_progress import alive_bar
 from .flickrknob import upload_photo, auth_check, create_album, get_albums
 from .photoutils import get_exif_date, is_known_suffix, EXIFerror
 from .utils import check_dir
-from .logutil import LogLevelAction
+from .logutil import LogLevelAction, get_file_logger
 
 flickrKey = config('FLICKR_KEY')
 flickrSecret = config('FLICKR_SECRET')
@@ -32,6 +32,9 @@ def uploader():
     parser.add_argument('-l', '--loglevel', action=LogLevelAction,
                         help='Set log level (e.g. \"ERROR\")',
                         default=logging.INFO)
+    parser.add_argument('--logfile',
+                        help='Log file to record uploaded files',
+                        default='files.log')
 
     parser.add_argument('photoset')
     parser.add_argument('sourceDir')
@@ -99,10 +102,13 @@ def uploader():
     logger.info("Uploading {} files".format(len(dir_entries)))
     photo_ids = {}
     primary_photo_id = None
+    #
+    # Log the photo IDs to a file so that it is easier to recover if something
+    # fails during the process.
+    #
+    file_logger = get_file_logger(args.logfile, __name__)
     with alive_bar(len(dir_entries)) as bar:
         for file_path in dir_entries:
-            # TODO: log the photo IDs to a file so that it is easier to
-            #       recover if something fails during the process.
             file_name = os.path.basename(file_path)
             try:
                 photo_id = upload_photo(flickr, file_path,
@@ -111,6 +117,7 @@ def uploader():
                 logger.error(e)
                 continue
 
+            file_logger.info("Uploaded '{}':{}".format(file_path, photo_id))
             photo_ids[file_name] = photo_id
             if primary_photo_id is None:
                 primary_photo_id = photo_id

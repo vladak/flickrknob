@@ -3,6 +3,14 @@ import sys
 import logging
 
 
+def create_trunc(file_path):
+    """
+    Make sure given file exists and has length of 0.
+    """
+    with open(file_path, 'w+') as fd:
+        fd.truncate()
+
+
 def confirm(msg):
     """
     Ask user to enter Y or N (case-insensitive).
