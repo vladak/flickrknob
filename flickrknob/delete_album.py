@@ -78,7 +78,6 @@ def delete_album_with_photos():
             photo_ids.append(photo_id)
     logger.debug("Photo IDs: {}".format(photo_ids))
 
-    # TODO: ask for confirmation
     if not confirm("Delete album with {} photos ? Y/N ".
                    format(len(photo_ids))):
         sys.exit(0)
