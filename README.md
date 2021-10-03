@@ -3,6 +3,7 @@
 The [Flickr Uploadr app](https://www.flickr.com/tools/) has a few limitations that make it unusable for my uses
 cases, namely:
   - cannot specify title of the photos to match file names of the uploaded photos
+    - this makes it easier to track the correspondence between Flickr photos and files on my hard drive 
   - the duplicate detection is inflexible. I want the photos still be present in
     the created album even though they are duplicate to some photos in the
     photostream.
