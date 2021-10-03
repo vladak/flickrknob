@@ -51,6 +51,7 @@ def create_album(flickr_handle, title, primary_photo_id):
     logger.info("Creating album '{}' with primary photo {}".
                 format(title, primary_photo_id))
     # Note: The album creation needs primary photo ID.
+    # The photo will be automatically added to the album.
     res = flickr_handle.photosets.create(title=title,
                                          primary_photo_id=primary_photo_id)
     album_id = res.find('photoset').attrib['id']
