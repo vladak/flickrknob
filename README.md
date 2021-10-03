@@ -1,6 +1,6 @@
 # Alternative Flickr uploader
 
-The Flickr Uploadr app has a few limitations that make it unusable for my uses
+The [Flickr Uploadr app](https://www.flickr.com/tools/) has a few limitations that make it unusable for my uses
 cases, namely:
   - cannot specify title of the photos to match file names of the uploaded photos
   - the duplicate detection is inflexible. I want the photos still be present in
