@@ -4,8 +4,9 @@ The [Flickr Uploadr app](https://www.flickr.com/tools/) has a few limitations th
 cases, namely:
   - cannot specify title of the photos to match file names of the uploaded photos
     - this makes it easier to track the correspondence between Flickr photos and files on my hard drive 
-  - the duplicate detection is inflexible. I want the photos still be present in
-    the created album even though they are duplicate to some photos in the
+  - the duplicate detection is inflexible. Flickr Uploader uses Flickr API parameter to detect duplicate photos.
+    Once a photo is detected as duplicate, it will not be addded to the album being created.
+    I want the photos still be present in the created album even though they are duplicate to some photos in the
     photostream.
   - cannot upload videos
 
