@@ -38,7 +38,7 @@ def get_exif_date(file_path):
                     raise EXIFerror("{} tag not correctly formed for '{}'".
                                     format(tag_name, file_path))
     except PermissionError as e:
-        raise EXIFerror("Permissing problem for '{}': {}".
+        raise EXIFerror("Permisson problem for '{}': {}".
                         format(file_path, e))
 
     raise EXIFerror("cannot find {} in '{}'".
