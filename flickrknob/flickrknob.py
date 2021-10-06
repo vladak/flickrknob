@@ -39,7 +39,7 @@ def get_albums(flickr_handle):
         logger.debug(ElementTree.tostring(photoset_elem, 'utf-8'))
         title_elem = photoset_elem.find('title')
         if title_elem is not None:
-        ret[title_elem.text] = photoset_elem.attrib['id']
+            ret[title_elem.text] = photoset_elem.attrib['id']
 
     return ret
 
