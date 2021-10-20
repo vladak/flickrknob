@@ -12,6 +12,8 @@ import sys
 from decouple import config
 import logging
 import argparse
+from concurrent.futures import ThreadPoolExecutor, as_completed
+import time
 
 from flickrapi import FlickrAPI, FlickrError
 from alive_progress import alive_bar
@@ -23,6 +25,26 @@ from .logutil import LogLevelAction, get_file_logger
 
 flickrKey = config('FLICKR_KEY')
 flickrSecret = config('FLICKR_SECRET')
+
+
+def upload_single_photo(file_path, bar, file_logger, flickr, dedup):
+
+    file_name = os.path.basename(file_path)
+    photo_id = upload_photo(flickr, file_path,
+                            title=file_name, dedup=dedup)
+
+    file_logger.info("Uploaded '{}':{}".format(file_path, photo_id))
+
+    return (file_name, photo_id)
+
+
+def add_photo_to_album(file_name, flickr, photo_id, album_id):
+
+    logger = logging.getLogger(__name__)
+
+    logger.debug("Adding file '{}' ({}) to album {}".
+                 format(file_name, photo_id, album_id))
+    flickr.photosets.addPhoto(photoset_id=album_id, photo_id=photo_id)
 
 
 def uploader():
@@ -37,6 +59,9 @@ def uploader():
     parser.add_argument('--logfile',
                         help='Log file to record uploaded files',
                         default='files-{album_name}.log')
+    parser.add_argument('--threads',
+                        help='Number of threads to create',
+                        default=4)
 
     parser.add_argument('photoset')
     parser.add_argument('sourceDir')
@@ -110,23 +135,31 @@ def uploader():
     #
     logfile = args.logfile.format(album_name=args.photoset)
     file_logger = get_file_logger(logfile, __name__)
+    numworkers = args.threads
     with alive_bar(len(dir_entries)) as bar:
-        for file_path in dir_entries:
-            file_name = os.path.basename(file_path)
-            try:
-                photo_id = upload_photo(flickr, file_path,
-                                        title=file_name, dedup=args.dedup)
-            except FlickrError as e:
-                logger.error(e)
-                continue
-
-            file_logger.info("Uploaded '{}':{}".format(file_path, photo_id))
-            photo_ids[file_name] = photo_id
-            if primary_photo_id is None:
-                primary_photo_id = photo_id
-            bar()
+        with ThreadPoolExecutor(max_workers=numworkers) as executor:
+            futures = []
+            for i, file_path in enumerate(dir_entries):
+                # Simulate pipeline start for better bandwidth utilization.
+                # Assumes the threads will start running immediately.
+                if i < numworkers:
+                    time.sleep(i * 0.5)
+                futures.append(
+                    executor.submit(upload_single_photo, file_path,
+                                    bar, file_logger, flickr, args.dedup)
+                )
+            for future in as_completed(futures):
+                try:
+                    bar()
+                    file_name, photo_id = future.result()
+                    photo_ids[file_name] = photo_id
+                    if primary_photo_id is None:
+                        primary_photo_id = photo_id
+                except FlickrError as e:
+                    logger.error(e)  # TODO shutdown () ?
 
     logger.info("Uploaded {} files".format(len(photo_ids)))
+    logger.debug("File to IDs: {}".format(photo_ids))
 
     album_id = create_album(flickr,
                             title=args.photoset,
@@ -138,12 +171,30 @@ def uploader():
     logger.info("Adding files to album '{}' ({})".
                 format(args.photoset, album_id))
     with alive_bar(len(photo_ids.keys()) - 1) as bar:
-        for name, photo_id in photo_ids.items():
-            # Primary photo was automatically added to the album so skip it.
-            if photo_id == primary_photo_id:
-                continue
+        with ThreadPoolExecutor(max_workers=numworkers) as executor:
+            futures = []
+            for name, photo_id in photo_ids.items():
+                # Primary photo was automatically added to the album,
+                # so skip it.
+                if photo_id == primary_photo_id:
+                    continue
 
-            logger.debug("Adding file '{}' ({}) to album {}".
-                         format(name, photo_id, album_id))
-            flickr.photosets.addPhoto(photoset_id=album_id, photo_id=photo_id)
-            bar()
+                futures.append(
+                    executor.submit(add_photo_to_album, name,
+                                    flickr, photo_id, album_id)
+                )
+
+            for future in as_completed(futures):
+                try:
+                    bar()
+                    future.result()
+                except FlickrError as e:
+                    logger.error(e)  # TODO shutdown () ?
+
+    # The files need to be reordered since they were uploaded in parallel.
+    logger.info("Sorting files in the album")
+    dir_file_names = list(map(os.path.basename, dir_entries))
+    photo_ids_sorted = list(map(photo_ids.get, dir_file_names))
+    logger.debug("Sorted photo IDs: {}".format(photo_ids_sorted))
+    flickr.photosets.reorderPhotos(photoset_id=album_id,
+                                   photo_ids=",".join(photo_ids_sorted))
