@@ -7,4 +7,4 @@ venv
 .flickr
 .DS_Store
 *.egg-info
-files.log
+*.log
