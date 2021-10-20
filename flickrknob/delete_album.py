@@ -25,6 +25,24 @@ flickrKey = config('FLICKR_DELETE_KEY')
 flickrSecret = config('FLICKR_DELETE_SECRET')
 
 
+def get_album_id(flickr, album_name):
+
+    logger = logging.getLogger(__name__)
+
+    logger.info("Getting list of albums")
+    albums = get_albums(flickr)
+    if albums is None or len(albums.items()) == 0:
+        logger.error("Empty list of albums")
+        return None
+
+    album_id = albums.get(album_name)
+    if album_id is None:
+        logger.error("Did not find album with name '{}'".format(album_name))
+        return None
+
+    return album_id
+
+
 def delete_album_with_photos():
     parser = argparse.ArgumentParser(description='delete Flickr album and '
                                                  'all its photos')
@@ -55,15 +73,8 @@ def delete_album_with_photos():
     flickr = flickrapi.FlickrAPI(flickrKey, flickrSecret)
     auth_check(flickr, perms='delete')
 
-    logger.info("Getting list of albums")
-    albums = get_albums(flickr)
-    if albums is None or len(albums.items()) == 0:
-        logger.error("Empty list of albums")
-        sys.exit(1)
-
-    album_id = albums.get(args.name)
+    album_id = get_album_id(flickr, args.name)
     if album_id is None:
-        logger.error("Did not find album with name '{}'".format(args.name))
         sys.exit(1)
 
     # Get list of photos in the album. (so that progress can be displayed)
@@ -92,4 +103,7 @@ def delete_album_with_photos():
 
     logger.info("Deleted {} files".format(cnt))
 
-    delete_album(flickr, album_id)
+    # After the photos are deleted, the album might not be present anymore.
+    album_id = get_album_id(flickr, args.name)
+    if album_id is not None:
+        delete_album(flickr, album_id)
