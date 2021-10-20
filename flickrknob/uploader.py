@@ -26,7 +26,9 @@ flickrSecret = config('FLICKR_SECRET')
 
 
 def uploader():
-    parser = argparse.ArgumentParser(description='yet another Flickr uploader')
+    parser = argparse.ArgumentParser(description='yet another Flickr uploader',
+                                     formatter_class=argparse.
+                                     ArgumentDefaultsHelpFormatter)
     parser.add_argument('-D', '--dedup', action='store_true', default=False,
                         help='deduplicate photos')
     parser.add_argument('-l', '--loglevel', action=LogLevelAction,
@@ -34,7 +36,7 @@ def uploader():
                         default=logging.INFO)
     parser.add_argument('--logfile',
                         help='Log file to record uploaded files',
-                        default='files.log')
+                        default='files-{album_name}.log')
 
     parser.add_argument('photoset')
     parser.add_argument('sourceDir')
@@ -106,7 +108,8 @@ def uploader():
     # Log the photo IDs to a file so that it is easier to recover if something
     # fails during the process.
     #
-    file_logger = get_file_logger(args.logfile, __name__)
+    logfile = args.logfile.format(album_name=args.photoset)
+    file_logger = get_file_logger(logfile, __name__)
     with alive_bar(len(dir_entries)) as bar:
         for file_path in dir_entries:
             file_name = os.path.basename(file_path)
