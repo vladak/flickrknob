@@ -34,7 +34,7 @@ def upload_single_photo(file_path, bar, file_logger, flickr, dedup):
                             title=file_name, dedup=dedup)
 
     bar()
-    file_logger.info("Uploaded '{}':{}".format(file_path, photo_id))
+    file_logger.info(f"Uploaded '{file_path}':{photo_id}")
 
     return (file_name, photo_id)
 
