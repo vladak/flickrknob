@@ -23,6 +23,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Install pylint
-	run: pip install pylint
+        run: pip install pylint
       - name: Run pylint
-	run: pylint **/*.py
+        run: pylint **/*.py
