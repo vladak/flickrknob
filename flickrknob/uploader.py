@@ -194,6 +194,6 @@ def uploader():
     logger.info("Sorting files in the album")
     dir_file_names = list(map(os.path.basename, dir_entries))
     photo_ids_sorted = list(map(photo_ids.get, dir_file_names))
-    logger.debug("Sorted photo IDs: {}".format(photo_ids_sorted))
+    logger.debug(f"Sorted photo IDs: {photo_ids_sorted}")
     flickr.photosets.reorderPhotos(photoset_id=album_id,
                                    photo_ids=",".join(photo_ids_sorted))
