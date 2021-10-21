@@ -125,7 +125,7 @@ def delete_album(flickr_handle, album_id):
     """
     logger = logging.getLogger(__name__)
 
-    logger.debug(f"Deleting album with ID {photo_id})")
+    logger.debug(f"Deleting album with ID {album_id})")
     flickr_handle.photosets.delete(photoset_id=album_id)
 
 
