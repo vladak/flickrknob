@@ -22,7 +22,7 @@ jobs:
           # config: path/to/flake8.ini
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: GitHub Action for pylint
-        uses: cclauss/GitHub-Action-for-pylint@0.7.0
-	with:
-	  args: "pip install . ; pylint **/*.py"
+      - name: Install pylint
+	run: pip install pylint
+      - name: Run pylint
+	run: pylint **/*.py
