@@ -26,7 +26,7 @@ def get_exif_date(file_path):
 
     logger = logging.getLogger(__name__)
 
-    logger.debug("Getting EXIF tags for '{}'".format(file_path))
+    logger.debug(f"Getting EXIF tags for '{file_path}'")
 
     tag_name = 'DateTimeOriginal'
     try:
@@ -35,8 +35,8 @@ def get_exif_date(file_path):
             try:
                 date_original = tags['EXIF ' + tag_name]
             except KeyError:
-                raise EXIFerror("File '{}' lacks EXIF {} tag".
-                                format(file_path, tag_name))
+                raise EXIFerror(f"File '{file_path}' lacks EXIF "
+                                "{tag_name} tag")
 
             if date_original:
                 try:
@@ -46,15 +46,17 @@ def get_exif_date(file_path):
                 except ValueError:
                     raise EXIFerror("{} tag not correctly formed for '{}'".
                                     format(tag_name, file_path))
-    except PermissionError as e:
-        raise EXIFerror("Permisson problem for '{}': {}".
-                        format(file_path, e))
+    except PermissionError as exc:
+        raise EXIFerror(f"Permisson problem for '{file_path}': {exc}")
 
-    raise EXIFerror("cannot find {} in '{}'".
-                    format(tag_name, file_path))
+    raise EXIFerror(f"cannot find {tag_name} in '{file_path}'")
 
 
 def is_known_suffix(file_name):
+    """
+    return whether given file name ends with hard-coded suffix
+    (case insensitive)
+    """
     file_name = file_name.lower()
     dot_index = file_name.rindex('.')
     extension = file_name[dot_index+1:]
