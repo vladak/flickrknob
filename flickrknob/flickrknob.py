@@ -71,7 +71,7 @@ def upload_photo(flickr_handle, file_path, title=None, description=None,
     res = None
     logger = logging.getLogger(__name__)
 
-    logger.debug("Uploading \"{0}\")".format(file_path))
+    logger.debug(f"Uploading \"{file_path}\")")
 
     params = {}
     if title is None:
@@ -105,7 +105,7 @@ def upload_photo(flickr_handle, file_path, title=None, description=None,
                         format(file_path, e.duplicate_photo_id))
             res = e.duplicate_photo_id
 
-    logger.debug("Uploaded '{}' as {}".format(file_path, res))
+    logger.debug(f"Uploaded '{file_path}' as {res}")
     return res
 
 
@@ -115,7 +115,7 @@ def delete_photo(flickr_handle, photo_id):
     """
     logger = logging.getLogger(__name__)
 
-    logger.debug("Deleting file with photo ID {})".format(photo_id))
+    logger.debug(f"Deleting file with photo ID {photo_id})")
     flickr_handle.photos.delete(photo_id=photo_id)
 
 
@@ -125,7 +125,7 @@ def delete_album(flickr_handle, album_id):
     """
     logger = logging.getLogger(__name__)
 
-    logger.debug("Deleting album with ID {})".format(album_id))
+    logger.debug(f"Deleting album with ID {photo_id})")
     flickr_handle.photosets.delete(photoset_id=album_id)
 
 
