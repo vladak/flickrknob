@@ -42,7 +42,8 @@ def upload_single_photo(file_path, bar, file_logger, flickr, dedup):
     return (file_name, photo_id)
 
 
-def add_photo_to_album(file_name, bar, flickr, photo_id, album_id):
+def add_photo_to_album(file_name, bar, file_logger, flickr, photo_id,
+                       album_id):
     """
     worker function to add photo to album and report progress
     """
@@ -52,6 +53,7 @@ def add_photo_to_album(file_name, bar, flickr, photo_id, album_id):
     logger.debug(f"Adding file '{file_name}' ({photo_id}) to album {album_id}")
     flickr.photosets.addPhoto(photoset_id=album_id, photo_id=photo_id)
     bar()
+    file_logger.info(f"Added {photo_id} to album {album_id}")
 
 
 def uploader():
@@ -152,7 +154,7 @@ def uploader():
                     if primary_photo_id is None:
                         primary_photo_id = photo_id
                 except FlickrError as exc:
-                    logger.error(exc)  # TODO shutdown () ?
+                    logger.error(exc)
 
     logger.info(f"Uploaded {len(photo_ids)} files")
     logger.debug(f"File to IDs: {photo_ids}")
@@ -176,14 +178,14 @@ def uploader():
 
                 futures.append(
                     executor.submit(add_photo_to_album, name, bar,
-                                    flickr, photo_id, album_id)
+                                    file_logger, flickr, photo_id, album_id)
                 )
 
             for future in as_completed(futures):
                 try:
                     future.result()
                 except FlickrError as exc:
-                    logger.error(exc)  # TODO shutdown () ?
+                    logger.error(exc)
 
     # The files need to be reordered since they were uploaded in parallel.
     logger.info("Sorting files in the album")
