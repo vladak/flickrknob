@@ -24,3 +24,5 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: GitHub Action for pylint
         uses: cclauss/GitHub-Action-for-pylint@0.7.0
+	with:
+	  args: "pip install . ; pylint **/*.py"
