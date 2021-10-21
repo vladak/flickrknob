@@ -12,13 +12,7 @@ import logging
 import flickrapi
 import webbrowser
 
-import xml.etree.ElementTree as ElementTree
-
-
-def report(bar, arg):
-    logger = logging.getLogger(__name__)
-    logger.debug("progress: {}".format(arg / 100))
-    bar(arg / 100)
+from xml.etree import ElementTree
 
 
 def get_albums(flickr_handle):

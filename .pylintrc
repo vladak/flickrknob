@@ -1,0 +1,3 @@
+[MESSAGES CONTROL]
+
+disable=disallowed-name  # this is because of bar()

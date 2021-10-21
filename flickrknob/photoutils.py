@@ -4,6 +4,11 @@ from datetime import datetime
 import exifread
 
 
+"""
+Utility functions for working with photo files.
+"""
+
+
 class EXIFerror(Exception):
     def __init__(self, msg):
         super().__init__(self, msg)
@@ -21,8 +26,8 @@ def get_exif_date(file_path):
 
     tag_name = 'DateTimeOriginal'
     try:
-        with open(file_path, 'rb') as f:
-            tags = exifread.process_file(f, stop_tag=tag_name)
+        with open(file_path, 'rb') as fobj:
+            tags = exifread.process_file(fobj, stop_tag=tag_name)
             try:
                 date_original = tags['EXIF ' + tag_name]
             except KeyError:

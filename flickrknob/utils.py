@@ -7,8 +7,8 @@ def create_trunc(file_path):
     """
     Make sure given file exists and has length of 0.
     """
-    with open(file_path, 'w+') as fd:
-        fd.truncate()
+    with open(file_path, 'w+') as file_object:
+        file_object.truncate()
 
 
 def confirm(msg):
