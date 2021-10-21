@@ -1,3 +1,9 @@
+"""
+
+helper functions
+
+"""
+
 import os
 import sys
 import logging
@@ -7,6 +13,7 @@ def create_trunc(file_path):
     """
     Make sure given file exists and has length of 0.
     """
+    # pylint: disable=W1514
     with open(file_path, 'w+') as file_object:
         file_object.truncate()
 
@@ -30,8 +37,8 @@ def check_dir(name):
 
     logger = logging.getLogger(__name__)
 
-    logger.debug("Checking if '{}' is directory".format(name))
+    logger.debug(f"Checking if '{name}' is directory")
 
     if not os.path.isdir(name):
-        logger.critical("{} is not a directory".format(name))
+        logger.critical(f"{name} is not a directory")
         sys.exit(1)

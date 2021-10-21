@@ -17,6 +17,12 @@
 # CDDL HEADER END
 #
 
+"""
+
+logging utilities
+
+"""
+
 import logging
 import argparse
 
@@ -63,8 +69,8 @@ def get_log_level(level):
         value = getattr(logging, level.upper())
         if type(value) is int:
             return value
-        else:
-            return None
+
+        return None
     except AttributeError:
         return None
 

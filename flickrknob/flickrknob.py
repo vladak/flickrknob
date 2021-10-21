@@ -22,7 +22,7 @@ def get_albums(flickr_handle):
 
     logger = logging.getLogger(__name__)
 
-    ret = dict()
+    ret = {}
 
     # Note: paging is not used currently. According to the API documentation
     #       this will return all photosets however this may change in the

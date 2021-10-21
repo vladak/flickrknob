@@ -1,15 +1,19 @@
+"""
+
+Utility functions for working with photo files.
+
+"""
+
 import logging
 from datetime import datetime
 
 import exifread
 
 
-"""
-Utility functions for working with photo files.
-"""
-
-
 class EXIFerror(Exception):
+    """
+    exception class to report problems with EXIF processing
+    """
     def __init__(self, msg):
         super().__init__(self, msg)
 
