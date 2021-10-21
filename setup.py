@@ -15,7 +15,6 @@ setup(name='flickrknob',
         'requests',
         'python-decouple',
         'alive-progress',
-        'flake8',
         'exifread'
       ],
       )
