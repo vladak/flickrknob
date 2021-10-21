@@ -160,13 +160,13 @@ def uploader():
                     logger.error(e)  # TODO shutdown () ?
 
     logger.info("Uploaded {} files".format(len(photo_ids)))
-    logger.debug("File to IDs: {}".format(photo_ids))
+    logger.debug(f"File to IDs: {photo_ids}")
 
     album_id = create_album(flickr,
                             title=args.photoset,
                             primary_photo_id=primary_photo_id)
     if album_id is None:
-        logger.error("Failed to create album '{}'".format(args.photoset))
+        logger.error(f"Failed to create album '{args.photoset}'")
         sys.exit(1)
 
     logger.info("Adding files to album '{}' ({})".
