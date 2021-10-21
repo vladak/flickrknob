@@ -35,6 +35,7 @@ def get_exif_date(file_path):
             try:
                 date_original = tags['EXIF ' + tag_name]
             except KeyError:
+                # pylint: disable=W0707
                 raise EXIFerror(f"File '{file_path}' lacks EXIF "
                                 "{tag_name} tag")
 
@@ -44,9 +45,11 @@ def get_exif_date(file_path):
                                                  '%Y:%m:%d %H:%M:%S')
                     return date_obj
                 except ValueError:
-                    raise EXIFerror("{} tag not correctly formed for '{}'".
-                                    format(tag_name, file_path))
+                    # pylint: disable=W0707
+                    raise EXIFerror(f"{tag_name} tag not correctly formed "
+                                    "for '{file_path}'")
     except PermissionError as exc:
+        # pylint: disable=W0707
         raise EXIFerror(f"Permisson problem for '{file_path}': {exc}")
 
     raise EXIFerror(f"cannot find {tag_name} in '{file_path}'")

@@ -85,9 +85,10 @@ def get_file_logger(logfile, logger_name):
 
     try:
         create_trunc(logfile)
-    except OSError as e:
-        logger.error(e)
+    except OSError as exc:
+        logger.error(exc)
         return None
+
     file_logger = logging.getLogger(logger_name)
     file_logger.propagate = False
     logger.setLevel(logging.INFO)

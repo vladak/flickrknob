@@ -9,10 +9,10 @@ It is mean really just to aid debugging the flickrUploader.
 """
 
 import sys
-from decouple import config
 import logging
 import argparse
 
+from decouple import config
 import flickrapi
 from alive_progress import alive_bar
 
@@ -26,6 +26,9 @@ flickrSecret = config('FLICKR_DELETE_SECRET')
 
 
 def get_album_id(flickr, album_name):
+    """
+    return ID for album name
+    """
 
     logger = logging.getLogger(__name__)
 
@@ -37,13 +40,16 @@ def get_album_id(flickr, album_name):
 
     album_id = albums.get(album_name)
     if album_id is None:
-        logger.error("Did not find album with name '{}'".format(album_name))
+        logger.error(f"Did not find album with name '{album_name}'")
         return None
 
     return album_id
 
 
 def delete_album_with_photos():
+    """
+    command line tool to delete an album with all its photos
+    """
     parser = argparse.ArgumentParser(description='delete Flickr album and '
                                                  'all its photos')
     parser.add_argument('-l', '--loglevel', action=LogLevelAction,
@@ -53,8 +59,8 @@ def delete_album_with_photos():
     parser.add_argument('name')
     try:
         args = parser.parse_args()
-    except ValueError as e:
-        print("Argument parsing failed: {}".format(e), file=sys.stderr)
+    except ValueError as exc:
+        print(f"Argument parsing failed: {exc}", file=sys.stderr)
         sys.exit(1)
 
     logger = logging.getLogger(__package__)
@@ -82,18 +88,17 @@ def delete_album_with_photos():
     res = flickr.photosets.getPhotos(photoset_id=album_id)
     photoset_elem = res.find('photoset')
     logger.debug(f"photoset elem: {photoset_elem}")
-    photo_ids = list()
+    photo_ids = []
     for photo_elem in list(photoset_elem.iter('photo')):
         photo_id = photo_elem.attrib['id']
         if photo_id:
             photo_ids.append(photo_id)
-    logger.debug("Photo IDs: {}".format(photo_ids))
+    logger.debug(f"Photo IDs: {photo_ids}")
 
-    if not confirm("Delete album with {} photos ? Y/N ".
-                   format(len(photo_ids))):
+    if not confirm(f"Delete album with {len(photo_ids)} photos ? Y/N "):
         sys.exit(0)
 
-    logger.info("Deleting {} files".format(len(photo_ids)))
+    logger.info(f"Deleting {len(photo_ids)} files")
     cnt = 0
     with alive_bar(len(photo_ids)) as bar:
         for photo_id in photo_ids:

@@ -8,11 +8,10 @@ Functions that wrap around Flickr API
 
 import os
 import logging
-
-import flickrapi
+from xml.etree import ElementTree
 import webbrowser
 
-from xml.etree import ElementTree
+import flickrapi
 
 
 def get_albums(flickr_handle):
@@ -39,19 +38,21 @@ def get_albums(flickr_handle):
 
 
 def create_album(flickr_handle, title, primary_photo_id):
+    """
+    create album with given title and primary photo
+    """
 
     logger = logging.getLogger(__name__)
 
-    logger.info("Creating album '{}' with primary photo {}".
-                format(title, primary_photo_id))
+    logger.info(f"Creating album '{title}' with "
+                "primary photo ID {primary_photo_id}")
     # Note: The album creation needs primary photo ID.
     # The photo will be automatically added to the album.
     res = flickr_handle.photosets.create(title=title,
                                          primary_photo_id=primary_photo_id)
     album_id = res.find('photoset').attrib['id']
     if album_id is not None:
-        logger.info("Created album '{}' with ID {}".
-                    format(title, album_id))
+        logger.info(f"Created album '{title}' with ID {album_id}")
 
     return album_id
 
@@ -92,18 +93,18 @@ def upload_photo(flickr_handle, file_path, title=None, description=None,
     if tags is not None:
         params['tags'] = tags
 
-    with open(file_path, 'rb') as fp:
+    with open(file_path, 'rb') as file_obj:
         try:
-            rsp = flickr_handle.upload(file_path, fileobj=fp,
+            rsp = flickr_handle.upload(file_path, fileobj=file_obj,
                                        **params)
             logger.debug(ElementTree.tostring(rsp, 'utf-8'))
             photo_id = rsp.find('photoid')
             if photo_id is not None:
                 res = photo_id.text
-        except flickrapi.exceptions.FlickrDuplicate as e:
-            logger.info("Duplicate photo '{}' with ID {}".
-                        format(file_path, e.duplicate_photo_id))
-            res = e.duplicate_photo_id
+        except flickrapi.exceptions.FlickrDuplicate as exc:
+            logger.info(f"Duplicate photo '{file_path}' with ID "
+                        "{exc.duplicate_photo_id}")
+            res = exc.duplicate_photo_id
 
     logger.debug(f"Uploaded '{file_path}' as {res}")
     return res
