@@ -20,14 +20,14 @@ def parse_args(parser):
         sys.exit(1)
 
 
-def check_env(flickrKey, flickrSecret):
+def check_env(flickr_key, flickr_secret):
     """
     check key and secret. If any is None, exit with 1.
     """
-    if flickrKey is None:
+    if flickr_key is None:
         print("Missing Flickr key")
         sys.exit(1)
-    if flickrSecret is None:
+    if flickr_secret is None:
         print("Missing Flickr secret")
         sys.exit(1)
 
