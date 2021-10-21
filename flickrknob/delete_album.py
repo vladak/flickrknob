@@ -18,7 +18,7 @@ from alive_progress import alive_bar
 
 from .flickrknob import auth_check, get_albums, delete_album, delete_photo
 from .logutil import LogLevelAction
-from .utils import confirm
+from .utils import confirm, check_env, parse_args
 
 
 flickrKey = config('FLICKR_DELETE_KEY')
@@ -55,25 +55,16 @@ def delete_album_with_photos():
     parser.add_argument('-l', '--loglevel', action=LogLevelAction,
                         help='Set log level (e.g. \"ERROR\")',
                         default=logging.INFO)
-
     parser.add_argument('name')
-    try:
-        args = parser.parse_args()
-    except ValueError as exc:
-        print(f"Argument parsing failed: {exc}", file=sys.stderr)
-        sys.exit(1)
+
+    args = parse_args(parser)
 
     logger = logging.getLogger(__package__)
     logger.setLevel(args.loglevel)
     handler = logging.StreamHandler()
     logger.addHandler(handler)
 
-    if flickrKey is None:
-        print("Missing Flickr key")
-        sys.exit(1)
-    if flickrSecret is None:
-        print("Missing Flickr secret")
-        sys.exit(1)
+    check_env(flickrKey, flickrSecret)
 
     logger.info("Checking authentication")
     flickr = flickrapi.FlickrAPI(flickrKey, flickrSecret)

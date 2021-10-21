@@ -20,7 +20,7 @@ from alive_progress import alive_bar
 
 from .flickrknob import upload_photo, auth_check, create_album, get_albums
 from .photoutils import get_exif_date, is_known_suffix, EXIFerror
-from .utils import check_dir
+from .utils import check_dir, check_env, parse_args
 from .logutil import LogLevelAction, get_file_logger
 
 flickrKey = config('FLICKR_KEY')
@@ -72,14 +72,10 @@ def uploader():
     parser.add_argument('--threads',
                         help='Number of threads to create',
                         default=4)
-
     parser.add_argument('photoset')
     parser.add_argument('sourceDir')
-    try:
-        args = parser.parse_args()
-    except ValueError as exc:
-        print(f"Argument parsing failed: {exc}", file=sys.stderr)
-        sys.exit(1)
+
+    args = parse_args(parser)
 
     logger = logging.getLogger(__package__)
     logger.setLevel(args.loglevel)
@@ -87,13 +83,7 @@ def uploader():
     logger.addHandler(handler)
 
     check_dir(args.sourceDir)
-
-    if flickrKey is None:
-        print("Missing Flickr key")
-        sys.exit(1)
-    if flickrSecret is None:
-        print("Missing Flickr secret")
-        sys.exit(1)
+    check_env(flickrKey, flickrSecret)
 
     logger.info("Checking authentication")
     flickr = FlickrAPI(flickrKey, flickrSecret)

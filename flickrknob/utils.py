@@ -9,6 +9,29 @@ import sys
 import logging
 
 
+def parse_args(parser):
+    """
+    parse command line arguments. exits on error.
+    """
+    try:
+        return parser.parse_args()
+    except ValueError as exc:
+        print(f"Argument parsing failed: {exc}", file=sys.stderr)
+        sys.exit(1)
+
+
+def check_env(flickrKey, flickrSecret):
+    """
+    check key and secret. If any is None, exit with 1.
+    """
+    if flickrKey is None:
+        print("Missing Flickr key")
+        sys.exit(1)
+    if flickrSecret is None:
+        print("Missing Flickr secret")
+        sys.exit(1)
+
+
 def create_trunc(file_path):
     """
     Make sure given file exists and has length of 0.
