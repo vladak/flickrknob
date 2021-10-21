@@ -14,19 +14,17 @@ jobs:
       - uses: actions/setup-python@v2
         with:
           python-version: "3.9"
-      - name: Run checks
-        uses: ricardochaves/python-lint@v1.4.0
+      - name: Run flake8
+        uses: julianwachholz/flake8-action@v2
         with:
-          python-root-list: "flickrknob"
-          use-pylint: true
-          use-pycodestyle: false
-          use-flake8: true
-          use-black: false
-          use-mypy: false
-          use-isort: false
-          extra-pylint-options: ""
-          extra-pycodestyle-options: ""
-          extra-flake8-options: ""
-          extra-black-options: ""
-          extra-mypy-options: ""
-          extra-isort-options: ""
+          checkName: "Run flake8"
+          path: flickrknob
+          # config: path/to/flake8.ini
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: pylint
+        uses: dciborow/action-pylint@0.0.3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          reporter: github-pr-review
+          level: warning
