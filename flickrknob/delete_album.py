@@ -17,7 +17,7 @@ import flickrapi
 from alive_progress import alive_bar
 
 from .flickrknob import auth_check, get_albums, delete_album, delete_photo
-from .logutil import LogLevelAction
+from .logutil import LogLevelAction, get_package_logger
 from .utils import confirm, check_env, parse_args
 
 
@@ -59,10 +59,7 @@ def delete_album_with_photos():
 
     args = parse_args(parser)
 
-    logger = logging.getLogger(__package__)
-    logger.setLevel(args.loglevel)
-    handler = logging.StreamHandler()
-    logger.addHandler(handler)
+    logger = get_package_logger(args.loglevel)
 
     check_env(flickrKey, flickrSecret)
 

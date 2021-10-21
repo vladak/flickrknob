@@ -96,3 +96,14 @@ def get_file_logger(logfile, logger_name):
     file_logger.addHandler(handler)
 
     return file_logger
+
+
+def get_package_logger(level):
+    """
+    get logger with stream handler for the package
+    """
+    logger = logging.getLogger(__package__)
+    logger.setLevel(level)
+    handler = logging.StreamHandler()
+    logger.addHandler(handler)
+    return logger

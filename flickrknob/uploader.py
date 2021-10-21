@@ -21,7 +21,7 @@ from alive_progress import alive_bar
 from .flickrknob import upload_photo, auth_check, create_album, get_albums
 from .photoutils import get_exif_date, is_known_suffix, EXIFerror
 from .utils import check_dir, check_env, parse_args
-from .logutil import LogLevelAction, get_file_logger
+from .logutil import LogLevelAction, get_file_logger, get_package_logger
 
 flickrKey = config('FLICKR_KEY')
 flickrSecret = config('FLICKR_SECRET')
@@ -77,10 +77,7 @@ def uploader():
 
     args = parse_args(parser)
 
-    logger = logging.getLogger(__package__)
-    logger.setLevel(args.loglevel)
-    handler = logging.StreamHandler()
-    logger.addHandler(handler)
+    logger = get_package_logger(args.loglevel)
 
     check_dir(args.sourceDir)
     check_env(flickrKey, flickrSecret)
