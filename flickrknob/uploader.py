@@ -9,12 +9,12 @@ for any other format supported by Flickr.
 
 import os
 import sys
-from decouple import config
 import logging
 import argparse
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import time
 
+from decouple import config
 from flickrapi import FlickrAPI, FlickrError
 from alive_progress import alive_bar
 
@@ -28,6 +28,9 @@ flickrSecret = config('FLICKR_SECRET')
 
 
 def upload_single_photo(file_path, bar, file_logger, flickr, dedup):
+    """
+    worker function to upload a photo and report progress
+    """
 
     file_name = os.path.basename(file_path)
     photo_id = upload_photo(flickr, file_path,
@@ -40,16 +43,21 @@ def upload_single_photo(file_path, bar, file_logger, flickr, dedup):
 
 
 def add_photo_to_album(file_name, bar, flickr, photo_id, album_id):
+    """
+    worker function to add photo to album and report progress
+    """
 
     logger = logging.getLogger(__name__)
 
-    logger.debug("Adding file '{}' ({}) to album {}".
-                 format(file_name, photo_id, album_id))
+    logger.debug(f"Adding file '{file_name}' ({photo_id}) to album {album_id}")
     flickr.photosets.addPhoto(photoset_id=album_id, photo_id=photo_id)
     bar()
 
 
 def uploader():
+    """
+    command line tool for uploading files
+    """
     parser = argparse.ArgumentParser(description='yet another Flickr uploader',
                                      formatter_class=argparse.
                                      ArgumentDefaultsHelpFormatter)
@@ -69,8 +77,8 @@ def uploader():
     parser.add_argument('sourceDir')
     try:
         args = parser.parse_args()
-    except ValueError as e:
-        print("Argument parsing failed: {}".format(e), file=sys.stderr)
+    except ValueError as exc:
+        print(f"Argument parsing failed: {exc}", file=sys.stderr)
         sys.exit(1)
 
     logger = logging.getLogger(__package__)
@@ -100,7 +108,7 @@ def uploader():
     #
     logger.info("Checking album name")
     albums = get_albums(flickr)
-    logger.debug("Albums: {}".format(albums))
+    logger.debug(f"Albums: {albums}")
     if albums is None or len(albums.items()) == 0:
         logger.error("Empty list of albums. Cannot check for dups.")
         sys.exit(1)
@@ -108,12 +116,12 @@ def uploader():
     album_names = albums.keys()
 
     if args.photoset in album_names:
-        logger.error("Duplicate album name: '{}'".format(args.photoset))
+        logger.error(f"Duplicate album name: '{args.photoset}'")
         sys.exit(1)
 
     # Upload files in the top level of the directory.
     dir_name = args.sourceDir
-    logger.info("Getting list of files from '{}'".format(dir_name))
+    logger.info(f"Getting list of files from '{dir_name}'")
     dir_entries = [os.path.join(dir_name, f) for f in os.listdir(dir_name)
                    if os.path.isfile(os.path.join(dir_name, f))
                    and is_known_suffix(f)]
@@ -123,12 +131,12 @@ def uploader():
     logger.info("Sorting files")
     try:
         dir_entries.sort(key=get_exif_date)
-    except EXIFerror as e:
-        logger.error(e)
+    except EXIFerror as exc:
+        logger.error(exc)
         sys.exit(1)
-    logger.debug("Sorted files: {}".format(dir_entries))
+    logger.debug(f"Sorted files: {dir_entries}")
 
-    logger.info("Uploading {} files".format(len(dir_entries)))
+    logger.info(f"Uploading {len(dir_entries)} files")
     photo_ids = {}
     primary_photo_id = None
     #
@@ -156,10 +164,10 @@ def uploader():
                     photo_ids[file_name] = photo_id
                     if primary_photo_id is None:
                         primary_photo_id = photo_id
-                except FlickrError as e:
-                    logger.error(e)  # TODO shutdown () ?
+                except FlickrError as exc:
+                    logger.error(exc)  # TODO shutdown () ?
 
-    logger.info("Uploaded {} files".format(len(photo_ids)))
+    logger.info(f"Uploaded {len(photo_ids)} files")
     logger.debug(f"File to IDs: {photo_ids}")
 
     album_id = create_album(flickr,
@@ -187,8 +195,8 @@ def uploader():
             for future in as_completed(futures):
                 try:
                     future.result()
-                except FlickrError as e:
-                    logger.error(e)  # TODO shutdown () ?
+                except FlickrError as exc:
+                    logger.error(exc)  # TODO shutdown () ?
 
     # The files need to be reordered since they were uploaded in parallel.
     logger.info("Sorting files in the album")

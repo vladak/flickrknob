@@ -1,3 +1,5 @@
 [MESSAGES CONTROL]
 
-disable=disallowed-name  # this is because of bar()
+disable=disallowed-name,  # this is because of bar()
+        logging-fstring-interpolation,
+	logging-format-interpolation
