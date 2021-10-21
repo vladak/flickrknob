@@ -91,6 +91,7 @@ def delete_album_with_photos():
     with alive_bar(len(photo_ids)) as bar:
         for photo_id in photo_ids:
             delete_photo(flickr, photo_id)
+            # pylint: disable=E1102
             bar()
             cnt = cnt + 1
 
