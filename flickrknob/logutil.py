@@ -42,12 +42,11 @@ class LogLevelAction(argparse.Action):
         super(LogLevelAction, self).__init__(option_strings, dest, **kwargs)
 
     def __call__(self, parser, namespace, values, option_string=None):
-        # print('%r %r %r' % (namespace, values, option_string))
         val = get_log_level(values)
         if val:
             setattr(namespace, self.dest, val)
         else:
-            raise ValueError("invalid log level '{}'".format(values))
+            raise ValueError(f"invalid log level '{values}'")
 
 
 def get_log_level(level):
