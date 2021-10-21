@@ -81,7 +81,7 @@ def delete_album_with_photos():
     logger.info("Getting photo IDs")
     res = flickr.photosets.getPhotos(photoset_id=album_id)
     photoset_elem = res.find('photoset')
-    logger.debug("photoset elem: {}".format(photoset_elem))
+    logger.debug(f"photoset elem: {photoset_elem}")
     photo_ids = list()
     for photo_elem in list(photoset_elem.iter('photo')):
         photo_id = photo_elem.attrib['id']
@@ -101,7 +101,7 @@ def delete_album_with_photos():
             bar()
             cnt = cnt + 1
 
-    logger.info("Deleted {} files".format(cnt))
+    logger.info(f"Deleted {cnt} files")
 
     # After the photos are deleted, the album might not be present anymore.
     album_id = get_album_id(flickr, args.name)
