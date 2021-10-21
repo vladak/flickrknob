@@ -33,18 +33,20 @@ def upload_single_photo(file_path, bar, file_logger, flickr, dedup):
     photo_id = upload_photo(flickr, file_path,
                             title=file_name, dedup=dedup)
 
+    bar()
     file_logger.info("Uploaded '{}':{}".format(file_path, photo_id))
 
     return (file_name, photo_id)
 
 
-def add_photo_to_album(file_name, flickr, photo_id, album_id):
+def add_photo_to_album(file_name, bar, flickr, photo_id, album_id):
 
     logger = logging.getLogger(__name__)
 
     logger.debug("Adding file '{}' ({}) to album {}".
                  format(file_name, photo_id, album_id))
     flickr.photosets.addPhoto(photoset_id=album_id, photo_id=photo_id)
+    bar()
 
 
 def uploader():
@@ -150,7 +152,6 @@ def uploader():
                 )
             for future in as_completed(futures):
                 try:
-                    bar()
                     file_name, photo_id = future.result()
                     photo_ids[file_name] = photo_id
                     if primary_photo_id is None:
@@ -180,13 +181,12 @@ def uploader():
                     continue
 
                 futures.append(
-                    executor.submit(add_photo_to_album, name,
+                    executor.submit(add_photo_to_album, name, bar,
                                     flickr, photo_id, album_id)
                 )
 
             for future in as_completed(futures):
                 try:
-                    bar()
                     future.result()
                 except FlickrError as e:
                     logger.error(e)  # TODO shutdown () ?
