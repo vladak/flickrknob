@@ -169,8 +169,7 @@ def uploader():
         logger.error(f"Failed to create album '{args.photoset}'")
         sys.exit(1)
 
-    logger.info("Adding files to album '{}' ({})".
-                format(args.photoset, album_id))
+    logger.info(f"Adding files to album '{args.photoset}' ({album_id})")
     with alive_bar(len(photo_ids.keys()) - 1) as bar:
         with ThreadPoolExecutor(max_workers=numworkers) as executor:
             futures = []
