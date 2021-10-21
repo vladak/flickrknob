@@ -14,17 +14,11 @@ jobs:
       - uses: actions/setup-python@v2
         with:
           python-version: "3.9"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install .
       - name: Run flake8
-        uses: julianwachholz/flake8-action@v2
-        with:
-          checkName: "Run flake8"
-          path: flickrknob
-          # config: path/to/flake8.ini
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: pylint
-        uses: dciborow/action-pylint@0.0.3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          reporter: github-pr-review
-          level: warning
+        run: |
+          pip install flake8
+          flake8 **/*.py
