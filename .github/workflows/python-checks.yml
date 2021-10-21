@@ -22,7 +22,9 @@ jobs:
           # config: path/to/flake8.ini
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Install pylint
-        run: pip install pylint
-      - name: Run pylint
-        run: pylint **/*.py
+      - name: pylint
+        uses: dciborow/action-pylint@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          reporter: github-pr-review
+          level: warning
