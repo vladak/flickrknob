@@ -42,15 +42,14 @@ def upload_single_photo(file_path, bar, file_logger, flickr, dedup):
     return (file_name, photo_id)
 
 
-def add_photo_to_album(file_name, bar, file_logger, flickr, photo_id,
-                       album_id):
+def add_photo_to_album(bar, file_logger, flickr, photo_id, album_id):
     """
     worker function to add photo to album and report progress
     """
 
     logger = logging.getLogger(__name__)
 
-    logger.debug(f"Adding file '{file_name}' ({photo_id}) to album {album_id}")
+    logger.debug(f"Adding file {photo_id} to album {album_id}")
     flickr.photosets.addPhoto(photoset_id=album_id, photo_id=photo_id)
     bar()
     file_logger.info(f"Added {photo_id} to album {album_id}")
@@ -170,14 +169,14 @@ def uploader():
     with alive_bar(len(photo_ids.keys()) - 1) as bar:
         with ThreadPoolExecutor(max_workers=numworkers) as executor:
             futures = []
-            for name, photo_id in photo_ids.items():
+            for photo_id in photo_ids.values():
                 # Primary photo was automatically added to the album,
                 # so skip it.
                 if photo_id == primary_photo_id:
                     continue
 
                 futures.append(
-                    executor.submit(add_photo_to_album, name, bar,
+                    executor.submit(add_photo_to_album, bar,
                                     file_logger, flickr, photo_id, album_id)
                 )
 
