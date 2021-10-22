@@ -57,6 +57,7 @@ def create_album(flickr_handle, title, primary_photo_id):
     return album_id
 
 
+# pylint: disable=R0913
 def upload_photo(flickr_handle, file_path, title=None, description=None,
                  tags=None, dedup=False):
     """
