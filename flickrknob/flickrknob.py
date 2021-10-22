@@ -11,7 +11,7 @@ import logging
 from xml.etree import ElementTree
 import webbrowser
 
-import flickrapi
+# import flickrapi
 
 
 def get_albums(flickr_handle):
@@ -88,6 +88,7 @@ def upload_photo(flickr_handle, file_path, title=None, description=None,
     # to be brought from the dead.
     if dedup:
         params['dedup_check'] = '2'
+        raise Exception("not ready yet, needs FlickrDuplicate")
 
     if description is not None:
         params['description'] = description
@@ -95,17 +96,16 @@ def upload_photo(flickr_handle, file_path, title=None, description=None,
         params['tags'] = tags
 
     with open(file_path, 'rb') as file_obj:
-        try:
-            rsp = flickr_handle.upload(file_path, fileobj=file_obj,
-                                       **params)
-            logger.debug(ElementTree.tostring(rsp, 'utf-8'))
-            photo_id = rsp.find('photoid')
-            if photo_id is not None:
-                res = photo_id.text
-        except flickrapi.exceptions.FlickrDuplicate as exc:
-            logger.info(f"Duplicate photo '{file_path}' with ID "
-                        "{exc.duplicate_photo_id}")
-            res = exc.duplicate_photo_id
+        rsp = flickr_handle.upload(file_path, fileobj=file_obj,
+                                   **params)
+        logger.debug(ElementTree.tostring(rsp, 'utf-8'))
+        photo_id = rsp.find('photoid')
+        if photo_id is not None:
+            res = photo_id.text
+        # except flickrapi.exceptions.FlickrDuplicate as exc:
+        #    logger.info(f"Duplicate photo '{file_path}' with ID "
+        #                "{exc.duplicate_photo_id}")
+        #    res = exc.duplicate_photo_id
 
     logger.debug(f"Uploaded '{file_path}' as {res}")
     return res
