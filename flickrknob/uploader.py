@@ -187,13 +187,14 @@ def uploader():
     #
     check_album_name(args, flickr)
 
-    # Upload files in the top level of the directory.
+    # List files in the top level of the directory.
     dir_name = args.sourceDir
     logger.info(f"Getting list of files from '{dir_name}'")
     dir_entries = [os.path.join(dir_name, f) for f in os.listdir(dir_name)
                    if os.path.isfile(os.path.join(dir_name, f))
                    and is_known_suffix(f)]
 
+    # Sort the files according to the EXIF date.
     # This serves also as prevention for file related problems in the upload
     # phase (except this is still a TOCTOU problem).
     logger.info("Sorting files")
