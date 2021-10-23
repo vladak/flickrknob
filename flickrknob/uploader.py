@@ -97,6 +97,42 @@ def check_album_name(args, flickr):
         sys.exit(1)
 
 
+def upload_files(dir_entries, file_logger, flickr, numworkers, dedup):
+    """
+    upload files to Flickr
+    """
+    logger = logging.getLogger(__name__)
+
+    logger.info(f"Uploading {len(dir_entries)} files")
+    photo_ids = {}
+    primary_photo_id = None
+    with alive_bar(len(dir_entries)) as bar:
+        with ThreadPoolExecutor(max_workers=numworkers) as executor:
+            futures = []
+            for i, file_path in enumerate(dir_entries):
+                # Simulate pipeline start for better bandwidth utilization.
+                # Assumes the threads will start running immediately.
+                if i < numworkers:
+                    time.sleep(i * 0.5)
+                futures.append(
+                    executor.submit(upload_single_photo, file_path,
+                                    bar, file_logger, flickr, dedup)
+                )
+            for future in as_completed(futures):
+                try:
+                    file_name, photo_id = future.result()
+                    photo_ids[file_name] = photo_id
+                    if primary_photo_id is None:
+                        primary_photo_id = photo_id
+                except FlickrError as exc:
+                    logger.error(exc)
+
+    logger.info(f"Uploaded {len(photo_ids)} files")
+    logger.debug(f"File to IDs: {photo_ids}")
+
+    return photo_ids, primary_photo_id
+
+
 def uploader():
     """
     command line tool for uploading files
@@ -138,39 +174,18 @@ def uploader():
         sys.exit(1)
     logger.debug(f"Sorted files: {dir_entries}")
 
-    logger.info(f"Uploading {len(dir_entries)} files")
-    photo_ids = {}
-    primary_photo_id = None
+    numworkers = args.threads
+
     #
     # Log the photo IDs to a file so that it is easier to recover if something
     # fails during the process.
     #
     logfile = args.logfile.format(album_name=args.photoset)
     file_logger = get_file_logger(logfile, __name__)
-    numworkers = args.threads
-    with alive_bar(len(dir_entries)) as bar:
-        with ThreadPoolExecutor(max_workers=numworkers) as executor:
-            futures = []
-            for i, file_path in enumerate(dir_entries):
-                # Simulate pipeline start for better bandwidth utilization.
-                # Assumes the threads will start running immediately.
-                if i < numworkers:
-                    time.sleep(i * 0.5)
-                futures.append(
-                    executor.submit(upload_single_photo, file_path,
-                                    bar, file_logger, flickr, args.dedup)
-                )
-            for future in as_completed(futures):
-                try:
-                    file_name, photo_id = future.result()
-                    photo_ids[file_name] = photo_id
-                    if primary_photo_id is None:
-                        primary_photo_id = photo_id
-                except FlickrError as exc:
-                    logger.error(exc)
 
-    logger.info(f"Uploaded {len(photo_ids)} files")
-    logger.debug(f"File to IDs: {photo_ids}")
+    photo_ids, primary_photo_id = upload_files(dir_entries, file_logger,
+                                               flickr, numworkers,
+                                               args.dedup)
 
     album_id = create_album(flickr,
                             title=args.photoset,
