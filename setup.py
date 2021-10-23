@@ -3,7 +3,7 @@
 from setuptools import setup
 
 setup(name='flickrknob',
-      version='0.1',
+      version='0.2',
       author='Vladimir Kotal',
       author_email='vlada@devnull.cz',
       # list folders, not files
