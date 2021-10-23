@@ -55,9 +55,9 @@ def add_photo_to_album(bar, file_logger, flickr, photo_id, album_id):
     file_logger.info(f"Added {photo_id} to album {album_id}")
 
 
-def uploader():
+def get_args():
     """
-    command line tool for uploading files
+    return parsed arguments from command line
     """
     parser = argparse.ArgumentParser(description='yet another Flickr uploader',
                                      formatter_class=argparse.
@@ -75,8 +75,33 @@ def uploader():
                         default=4)
     parser.add_argument('photoset')
     parser.add_argument('sourceDir')
-
     args = parse_args(parser)
+    return args
+
+
+def check_album_name(args, flickr):
+    """
+    Check if album name already exists. If it does, exit the program.
+    """
+    logger = logging.getLogger(__name__)
+
+    logger.info("Checking album name")
+    albums = get_albums(flickr)
+    logger.debug(f"Albums: {albums}")
+    if albums is None or len(albums.items()) == 0:
+        logger.error("Empty list of albums. Cannot check for dups.")
+        sys.exit(1)
+    album_names = albums.keys()
+    if args.photoset in album_names:
+        logger.error(f"Duplicate album name: '{args.photoset}'")
+        sys.exit(1)
+
+
+def uploader():
+    """
+    command line tool for uploading files
+    """
+    args = get_args()
 
     logger = get_package_logger(args.loglevel)
 
@@ -94,18 +119,7 @@ def uploader():
     # in order to create an album, there needs to be at least one photo
     # uploaded to be used as title photo.
     #
-    logger.info("Checking album name")
-    albums = get_albums(flickr)
-    logger.debug(f"Albums: {albums}")
-    if albums is None or len(albums.items()) == 0:
-        logger.error("Empty list of albums. Cannot check for dups.")
-        sys.exit(1)
-
-    album_names = albums.keys()
-
-    if args.photoset in album_names:
-        logger.error(f"Duplicate album name: '{args.photoset}'")
-        sys.exit(1)
+    check_album_name(args, flickr)
 
     # Upload files in the top level of the directory.
     dir_name = args.sourceDir
