@@ -213,7 +213,7 @@ def uploader():
     # Sort the files according to the EXIF date.
     # This serves also as prevention for file related problems in the upload
     # phase (except this is still a TOCTOU problem).
-    logger.info("Sorting files")
+    logger.info(f"Sorting {len(dir_entries)} files")
     try:
         dir_entries.sort(key=get_exif_date)
     except EXIFerror as exc:
