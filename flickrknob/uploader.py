@@ -79,7 +79,7 @@ def get_args():
     return args
 
 
-def check_album_name(args, flickr):
+def check_album_name(album_name, flickr):
     """
     Check if album name already exists. If it does, exit the program.
     """
@@ -92,8 +92,8 @@ def check_album_name(args, flickr):
         logger.error("Empty list of albums. Cannot check for dups.")
         sys.exit(1)
     album_names = albums.keys()
-    if args.photoset in album_names:
-        logger.error(f"Duplicate album name: '{args.photoset}'")
+    if album_name in album_names:
+        logger.error(f"Duplicate album name: '{album_name}'")
         sys.exit(1)
 
 
@@ -199,7 +199,7 @@ def uploader():
     # in order to create an album, there needs to be at least one photo
     # uploaded to be used as title photo.
     #
-    check_album_name(args, flickr)
+    check_album_name(args.photoset, flickr)
 
     # List files in the top level of the directory.
     dir_name = args.sourceDir
