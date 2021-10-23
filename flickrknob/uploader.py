@@ -97,6 +97,7 @@ def check_album_name(album_name, flickr):
         sys.exit(1)
 
 
+# pylint: disable=R0914
 def upload_files(dir_entries, file_logger, flickr, numworkers, dedup):
     """
     upload files to Flickr
@@ -177,6 +178,7 @@ def reorder_files(album_id, dir_entries, flickr, photo_ids):
                                    photo_ids=",".join(photo_ids_sorted))
 
 
+# pylint: disable=R0914
 def uploader():
     """
     command line tool for uploading files
