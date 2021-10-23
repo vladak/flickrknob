@@ -163,6 +163,20 @@ def add_files_to_album(album_id, file_logger, flickr, numworkers, photo_ids,
                     logger.error(exc)
 
 
+def reorder_files(album_id, dir_entries, flickr, photo_ids):
+    """
+    reorder files in the album
+    """
+    logger = logging.getLogger(__name__)
+
+    logger.info("Sorting files in the album")
+    dir_file_names = list(map(os.path.basename, dir_entries))
+    photo_ids_sorted = list(map(photo_ids.get, dir_file_names))
+    logger.debug(f"Sorted photo IDs: {photo_ids_sorted}")
+    flickr.photosets.reorderPhotos(photoset_id=album_id,
+                                   photo_ids=",".join(photo_ids_sorted))
+
+
 def uploader():
     """
     command line tool for uploading files
@@ -205,12 +219,11 @@ def uploader():
         sys.exit(1)
     logger.debug(f"Sorted files: {dir_entries}")
 
-    #
     # Log the photo IDs to a file so that it is easier to recover if something
     # fails during the process.
-    #
-    logfile = args.logfile.format(album_name=args.photoset)
-    file_logger = get_file_logger(logfile, __name__)
+    file_logger = get_file_logger(args.logfile.
+                                  format(album_name=args.photoset),
+                                  __name__)
 
     photo_ids, primary_photo_id = upload_files(dir_entries, file_logger,
                                                flickr, args.threads,
@@ -227,9 +240,4 @@ def uploader():
                        photo_ids, primary_photo_id)
 
     # The files need to be reordered since they were uploaded in parallel.
-    logger.info("Sorting files in the album")
-    dir_file_names = list(map(os.path.basename, dir_entries))
-    photo_ids_sorted = list(map(photo_ids.get, dir_file_names))
-    logger.debug(f"Sorted photo IDs: {photo_ids_sorted}")
-    flickr.photosets.reorderPhotos(photoset_id=album_id,
-                                   photo_ids=",".join(photo_ids_sorted))
+    reorder_files(album_id, dir_entries, flickr, photo_ids)
