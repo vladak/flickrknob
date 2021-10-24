@@ -52,7 +52,7 @@ def delete_album_with_photos():
     """
     parser = argparse.ArgumentParser(
         description="delete Flickr album and " "all its photos",
-        parents=[get_base_parser()]
+        parents=[get_base_parser()],
     )
     parser.add_argument("name")
 
