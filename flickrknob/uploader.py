@@ -19,7 +19,8 @@ from decouple import config
 from flickrapi import FlickrAPI, FlickrError
 
 from .flickrknob import auth_check, create_album, get_albums, upload_photo
-from .logutil import LogLevelAction, get_file_logger, get_package_logger
+from .logutil import get_file_logger, get_package_logger
+from .parserutil import get_base_parser
 from .photoutils import EXIFerror, get_exif_date, is_known_suffix
 from .utils import check_dir, check_env, parse_args
 
@@ -58,19 +59,10 @@ def get_args():
     """
     return parsed arguments from command line
     """
-    parser = argparse.ArgumentParser(
-        description="yet another Flickr uploader",
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
-    )
+    parser = argparse.ArgumentParser(description="yet another Flickr uploader",
+                                     parents=[get_base_parser()])
     parser.add_argument(
         "-D", "--dedup", action="store_true", default=False, help="deduplicate photos"
-    )
-    parser.add_argument(
-        "-l",
-        "--loglevel",
-        action=LogLevelAction,
-        help='Set log level (e.g. "ERROR")',
-        default=logging.INFO,
     )
     parser.add_argument(
         "--logfile",

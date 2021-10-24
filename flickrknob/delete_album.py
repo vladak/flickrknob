@@ -17,7 +17,8 @@ from alive_progress import alive_bar
 from decouple import config
 
 from .flickrknob import auth_check, delete_album, delete_photo, get_albums
-from .logutil import LogLevelAction, get_package_logger
+from .logutil import get_package_logger
+from .parserutil import get_base_parser
 from .utils import check_env, confirm, parse_args
 
 flickrKey = config("FLICKR_DELETE_KEY")
@@ -50,14 +51,8 @@ def delete_album_with_photos():
     command line tool to delete an album with all its photos
     """
     parser = argparse.ArgumentParser(
-        description="delete Flickr album and " "all its photos"
-    )
-    parser.add_argument(
-        "-l",
-        "--loglevel",
-        action=LogLevelAction,
-        help='Set log level (e.g. "ERROR")',
-        default=logging.INFO,
+        description="delete Flickr album and " "all its photos",
+        parents=[get_base_parser()]
     )
     parser.add_argument("name")
 
