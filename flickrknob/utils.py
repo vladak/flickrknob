@@ -4,9 +4,9 @@ helper functions
 
 """
 
+import logging
 import os
 import sys
-import logging
 
 
 def parse_args(parser):

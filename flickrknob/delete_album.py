@@ -8,18 +8,17 @@ It is mean really just to aid debugging the flickrUploader.
 
 """
 
-import sys
-import logging
 import argparse
+import logging
+import sys
 
-from decouple import config
 import flickrapi
 from alive_progress import alive_bar
+from decouple import config
 
-from .flickrknob import auth_check, get_albums, delete_album, delete_photo
+from .flickrknob import auth_check, delete_album, delete_photo, get_albums
 from .logutil import LogLevelAction, get_package_logger
-from .utils import confirm, check_env, parse_args
-
+from .utils import check_env, confirm, parse_args
 
 flickrKey = config("FLICKR_DELETE_KEY")
 flickrSecret = config("FLICKR_DELETE_SECRET")

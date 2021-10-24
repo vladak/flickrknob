@@ -23,8 +23,8 @@ logging utilities
 
 """
 
-import logging
 import argparse
+import logging
 
 from .utils import create_trunc
 

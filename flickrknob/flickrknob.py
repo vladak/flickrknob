@@ -6,10 +6,10 @@ Functions that wrap around Flickr API
 
 """
 
-import os
 import logging
-from xml.etree import ElementTree
+import os
 import webbrowser
+from xml.etree import ElementTree
 
 # import flickrapi
 

@@ -7,21 +7,21 @@ for any other format supported by Flickr.
 
 """
 
+import argparse
+import logging
 import os
 import sys
-import logging
-import argparse
-from concurrent.futures import ThreadPoolExecutor, as_completed
 import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
+from alive_progress import alive_bar
 from decouple import config
 from flickrapi import FlickrAPI, FlickrError
-from alive_progress import alive_bar
 
-from .flickrknob import upload_photo, auth_check, create_album, get_albums
-from .photoutils import get_exif_date, is_known_suffix, EXIFerror
-from .utils import check_dir, check_env, parse_args
+from .flickrknob import auth_check, create_album, get_albums, upload_photo
 from .logutil import LogLevelAction, get_file_logger, get_package_logger
+from .photoutils import EXIFerror, get_exif_date, is_known_suffix
+from .utils import check_dir, check_env, parse_args
 
 flickrKey = config("FLICKR_KEY")
 flickrSecret = config("FLICKR_SECRET")

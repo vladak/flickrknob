@@ -30,3 +30,7 @@ jobs:
         run: |
           pip install black
           black --check **/*.py
+      - name: Run isort in check mode
+        run: |
+          pip install isort
+          isort **/*.py  --check --diff
