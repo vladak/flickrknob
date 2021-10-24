@@ -64,6 +64,7 @@ def is_known_suffix(file_name):
     """
     file_name = file_name.lower()
     dot_index = file_name.rindex(".")
-    extension = file_name[dot_index + 1:]
+    strip_index = dot_index + 1
+    extension = file_name[strip_index:]
 
     return extension in ["jpg", "jpeg", "mov", "mp4"]
