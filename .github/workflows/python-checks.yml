@@ -26,3 +26,7 @@ jobs:
         run: |
           pip install pylint
           pylint **/*.py
+      - name: Run black in check mode
+        run: |
+          pip install black
+          black --check **/*.py
