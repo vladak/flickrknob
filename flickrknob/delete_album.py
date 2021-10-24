@@ -21,8 +21,8 @@ from .logutil import LogLevelAction, get_package_logger
 from .utils import confirm, check_env, parse_args
 
 
-flickrKey = config('FLICKR_DELETE_KEY')
-flickrSecret = config('FLICKR_DELETE_SECRET')
+flickrKey = config("FLICKR_DELETE_KEY")
+flickrSecret = config("FLICKR_DELETE_SECRET")
 
 
 def get_album_id(flickr, album_name):
@@ -50,12 +50,17 @@ def delete_album_with_photos():
     """
     command line tool to delete an album with all its photos
     """
-    parser = argparse.ArgumentParser(description='delete Flickr album and '
-                                                 'all its photos')
-    parser.add_argument('-l', '--loglevel', action=LogLevelAction,
-                        help='Set log level (e.g. \"ERROR\")',
-                        default=logging.INFO)
-    parser.add_argument('name')
+    parser = argparse.ArgumentParser(
+        description="delete Flickr album and " "all its photos"
+    )
+    parser.add_argument(
+        "-l",
+        "--loglevel",
+        action=LogLevelAction,
+        help='Set log level (e.g. "ERROR")',
+        default=logging.INFO,
+    )
+    parser.add_argument("name")
 
     args = parse_args(parser)
 
@@ -65,7 +70,7 @@ def delete_album_with_photos():
 
     logger.info("Checking authentication")
     flickr = flickrapi.FlickrAPI(flickrKey, flickrSecret)
-    auth_check(flickr, perms='delete')
+    auth_check(flickr, perms="delete")
 
     album_id = get_album_id(flickr, args.name)
     if album_id is None:
@@ -74,11 +79,11 @@ def delete_album_with_photos():
     # Get list of photos in the album. (so that progress can be displayed)
     logger.info("Getting photo IDs")
     res = flickr.photosets.getPhotos(photoset_id=album_id)
-    photoset_elem = res.find('photoset')
+    photoset_elem = res.find("photoset")
     logger.debug(f"photoset elem: {photoset_elem}")
     photo_ids = []
-    for photo_elem in list(photoset_elem.iter('photo')):
-        photo_id = photo_elem.attrib['id']
+    for photo_elem in list(photoset_elem.iter("photo")):
+        photo_id = photo_elem.attrib["id"]
         if photo_id:
             photo_ids.append(photo_id)
     logger.debug(f"Photo IDs: {photo_ids}")

@@ -14,6 +14,7 @@ class EXIFerror(Exception):
     """
     exception class to report problems with EXIF processing
     """
+
     def __init__(self, msg):
         super().__init__(self, msg)
 
@@ -28,26 +29,27 @@ def get_exif_date(file_path):
 
     logger.debug(f"Getting EXIF tags for '{file_path}'")
 
-    tag_name = 'DateTimeOriginal'
+    tag_name = "DateTimeOriginal"
     try:
-        with open(file_path, 'rb') as fobj:
+        with open(file_path, "rb") as fobj:
             tags = exifread.process_file(fobj, stop_tag=tag_name)
             try:
-                date_original = tags['EXIF ' + tag_name]
+                date_original = tags["EXIF " + tag_name]
             except KeyError:
                 # pylint: disable=W0707
-                raise EXIFerror(f"File '{file_path}' lacks EXIF "
-                                "{tag_name} tag")
+                raise EXIFerror(f"File '{file_path}' lacks EXIF " "{tag_name} tag")
 
             if date_original:
                 try:
-                    date_obj = datetime.strptime(str(date_original),
-                                                 '%Y:%m:%d %H:%M:%S')
+                    date_obj = datetime.strptime(
+                        str(date_original), "%Y:%m:%d %H:%M:%S"
+                    )
                     return date_obj
                 except ValueError:
                     # pylint: disable=W0707
-                    raise EXIFerror(f"{tag_name} tag not correctly formed "
-                                    "for '{file_path}'")
+                    raise EXIFerror(
+                        f"{tag_name} tag not correctly formed " "for '{file_path}'"
+                    )
     except PermissionError as exc:
         # pylint: disable=W0707
         raise EXIFerror(f"Permisson problem for '{file_path}': {exc}")
@@ -61,7 +63,7 @@ def is_known_suffix(file_name):
     (case insensitive)
     """
     file_name = file_name.lower()
-    dot_index = file_name.rindex('.')
-    extension = file_name[dot_index+1:]
+    dot_index = file_name.rindex(".")
+    extension = file_name[dot_index + 1:]
 
-    return extension in ['jpg', 'jpeg', 'mov', 'mp4']
+    return extension in ["jpg", "jpeg", "mov", "mp4"]

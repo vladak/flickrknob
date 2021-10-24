@@ -36,6 +36,7 @@ class LogLevelAction(argparse.Action):
     in the logging module. On success, its numeric value is stored in the
     namespace, otherwise ValueError exception is thrown.
     """
+
     def __init__(self, option_strings, dest, nargs=None, **kwargs):
         if nargs is not None:
             raise ValueError("nargs not allowed")

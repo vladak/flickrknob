@@ -23,8 +23,8 @@ from .photoutils import get_exif_date, is_known_suffix, EXIFerror
 from .utils import check_dir, check_env, parse_args
 from .logutil import LogLevelAction, get_file_logger, get_package_logger
 
-flickrKey = config('FLICKR_KEY')
-flickrSecret = config('FLICKR_SECRET')
+flickrKey = config("FLICKR_KEY")
+flickrSecret = config("FLICKR_SECRET")
 
 
 def upload_single_photo(file_path, bar, file_logger, flickr, dedup):
@@ -33,8 +33,7 @@ def upload_single_photo(file_path, bar, file_logger, flickr, dedup):
     """
 
     file_name = os.path.basename(file_path)
-    photo_id = upload_photo(flickr, file_path,
-                            title=file_name, dedup=dedup)
+    photo_id = upload_photo(flickr, file_path, title=file_name, dedup=dedup)
 
     bar()
     file_logger.info(f"Uploaded '{file_path}':{photo_id}")
@@ -59,22 +58,28 @@ def get_args():
     """
     return parsed arguments from command line
     """
-    parser = argparse.ArgumentParser(description='yet another Flickr uploader',
-                                     formatter_class=argparse.
-                                     ArgumentDefaultsHelpFormatter)
-    parser.add_argument('-D', '--dedup', action='store_true', default=False,
-                        help='deduplicate photos')
-    parser.add_argument('-l', '--loglevel', action=LogLevelAction,
-                        help='Set log level (e.g. \"ERROR\")',
-                        default=logging.INFO)
-    parser.add_argument('--logfile',
-                        help='Log file to record uploaded files',
-                        default='files-{album_name}.log')
-    parser.add_argument('--threads',
-                        help='Number of threads to create',
-                        default=4)
-    parser.add_argument('photoset')
-    parser.add_argument('sourceDir')
+    parser = argparse.ArgumentParser(
+        description="yet another Flickr uploader",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+    )
+    parser.add_argument(
+        "-D", "--dedup", action="store_true", default=False, help="deduplicate photos"
+    )
+    parser.add_argument(
+        "-l",
+        "--loglevel",
+        action=LogLevelAction,
+        help='Set log level (e.g. "ERROR")',
+        default=logging.INFO,
+    )
+    parser.add_argument(
+        "--logfile",
+        help="Log file to record uploaded files",
+        default="files-{album_name}.log",
+    )
+    parser.add_argument("--threads", help="Number of threads to create", default=4)
+    parser.add_argument("photoset")
+    parser.add_argument("sourceDir")
     args = parse_args(parser)
     return args
 
@@ -116,8 +121,9 @@ def upload_files(dir_entries, file_logger, flickr, numworkers, dedup):
                 if i < numworkers:
                     time.sleep(i * 0.5)
                 futures.append(
-                    executor.submit(upload_single_photo, file_path,
-                                    bar, file_logger, flickr, dedup)
+                    executor.submit(
+                        upload_single_photo, file_path, bar, file_logger, flickr, dedup
+                    )
                 )
             for future in as_completed(futures):
                 try:
@@ -135,8 +141,9 @@ def upload_files(dir_entries, file_logger, flickr, numworkers, dedup):
 
 
 # pylint: disable=R0913
-def add_files_to_album(album_id, file_logger, flickr, numworkers, photo_ids,
-                       primary_photo_id):
+def add_files_to_album(
+    album_id, file_logger, flickr, numworkers, photo_ids, primary_photo_id
+):
     """
     add files to album
     """
@@ -153,8 +160,9 @@ def add_files_to_album(album_id, file_logger, flickr, numworkers, photo_ids,
                     continue
 
                 futures.append(
-                    executor.submit(add_photo_to_album, bar,
-                                    file_logger, flickr, photo_id, album_id)
+                    executor.submit(
+                        add_photo_to_album, bar, file_logger, flickr, photo_id, album_id
+                    )
                 )
 
             for future in as_completed(futures):
@@ -174,8 +182,9 @@ def reorder_files(album_id, dir_entries, flickr, photo_ids):
     dir_file_names = list(map(os.path.basename, dir_entries))
     photo_ids_sorted = list(map(photo_ids.get, dir_file_names))
     logger.debug(f"Sorted photo IDs: {photo_ids_sorted}")
-    flickr.photosets.reorderPhotos(photoset_id=album_id,
-                                   photo_ids=",".join(photo_ids_sorted))
+    flickr.photosets.reorderPhotos(
+        photoset_id=album_id, photo_ids=",".join(photo_ids_sorted)
+    )
 
 
 # pylint: disable=R0914
@@ -192,7 +201,7 @@ def uploader():
 
     logger.info("Checking authentication")
     flickr = FlickrAPI(flickrKey, flickrSecret)
-    auth_check(flickr, perms='write')
+    auth_check(flickr, perms="write")
 
     #
     # First check if album with same name exists. The create() API endpoint
@@ -206,9 +215,11 @@ def uploader():
     # List files in the top level of the directory.
     dir_name = args.sourceDir
     logger.info(f"Getting list of files from '{dir_name}'")
-    dir_entries = [os.path.join(dir_name, f) for f in os.listdir(dir_name)
-                   if os.path.isfile(os.path.join(dir_name, f))
-                   and is_known_suffix(f)]
+    dir_entries = [
+        os.path.join(dir_name, f)
+        for f in os.listdir(dir_name)
+        if os.path.isfile(os.path.join(dir_name, f)) and is_known_suffix(f)
+    ]
 
     # Sort the files according to the EXIF date.
     # This serves also as prevention for file related problems in the upload
@@ -223,23 +234,24 @@ def uploader():
 
     # Log the photo IDs to a file so that it is easier to recover if something
     # fails during the process.
-    file_logger = get_file_logger(args.logfile.
-                                  format(album_name=args.photoset),
-                                  __name__)
+    file_logger = get_file_logger(
+        args.logfile.format(album_name=args.photoset), __name__
+    )
 
-    photo_ids, primary_photo_id = upload_files(dir_entries, file_logger,
-                                               flickr, args.threads,
-                                               args.dedup)
+    photo_ids, primary_photo_id = upload_files(
+        dir_entries, file_logger, flickr, args.threads, args.dedup
+    )
 
-    album_id = create_album(flickr,
-                            title=args.photoset,
-                            primary_photo_id=primary_photo_id)
+    album_id = create_album(
+        flickr, title=args.photoset, primary_photo_id=primary_photo_id
+    )
     if album_id is None:
         logger.error(f"Failed to create album '{args.photoset}'")
         sys.exit(1)
 
-    add_files_to_album(album_id, file_logger, flickr, args.threads,
-                       photo_ids, primary_photo_id)
+    add_files_to_album(
+        album_id, file_logger, flickr, args.threads, photo_ids, primary_photo_id
+    )
 
     # The files need to be reordered since they were uploaded in parallel.
     reorder_files(album_id, dir_entries, flickr, photo_ids)
