@@ -51,6 +51,7 @@ def delete_album_with_photos():
     command line tool to delete an album with all its photos
     """
     parser = argparse.ArgumentParser(
+        add_help=False,
         description="delete Flickr album and " "all its photos",
         parents=[get_base_parser()],
     )

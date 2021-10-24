@@ -60,7 +60,9 @@ def get_args():
     return parsed arguments from command line
     """
     parser = argparse.ArgumentParser(
-        description="yet another Flickr uploader", parents=[get_base_parser()]
+        add_help=False,
+        description="yet another Flickr uploader",
+        parents=[get_base_parser()],
     )
     parser.add_argument(
         "-D", "--dedup", action="store_true", default=False, help="deduplicate photos"
