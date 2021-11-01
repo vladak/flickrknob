@@ -52,7 +52,7 @@ def get_exif_date(file_path):
                     )
     except PermissionError as exc:
         # pylint: disable=W0707
-        raise EXIFerror(f"Permisson problem for '{file_path}': {exc}")
+        raise EXIFerror(f"Permission problem for '{file_path}': {exc}")
 
     raise EXIFerror(f"cannot find {tag_name} in '{file_path}'")
 
