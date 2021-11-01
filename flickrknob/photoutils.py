@@ -42,9 +42,7 @@ def get_exif_date(file_path):
 
         if date_original:
             try:
-                date_obj = datetime.strptime(
-                    str(date_original), "%Y:%m:%d %H:%M:%S"
-                )
+                date_obj = datetime.strptime(str(date_original), "%Y:%m:%d %H:%M:%S")
                 return date_obj
             except ValueError:
                 # pylint: disable=W0707
