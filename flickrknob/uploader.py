@@ -2,7 +2,7 @@
 
 """
 
-This is primarily meant for uploging JPEG files however it should work
+This is primarily meant for uploading JPEG files however it should work
 for any other format supported by Flickr.
 
 """
