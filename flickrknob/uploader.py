@@ -21,7 +21,7 @@ from flickrapi import FlickrAPI, FlickrError
 from .flickrknob import auth_check, create_album, get_albums, upload_photo
 from .logutil import get_file_logger, get_package_logger
 from .parserutil import get_base_parser
-from .photoutils import EXIFerror, get_exif_date, is_known_suffix
+from .photoutils import get_date, is_known_suffix
 from .utils import check_dir, check_env, parse_args
 
 flickrKey = config("FLICKR_KEY")
@@ -216,13 +216,13 @@ def uploader():
         if os.path.isfile(os.path.join(dir_name, f)) and is_known_suffix(f)
     ]
 
-    # Sort the files according to the EXIF date.
+    # Sort the files according to the (EXIF) date.
     # This serves also as prevention for file related problems in the upload
     # phase (except this is still a TOCTOU problem).
     logger.info(f"Sorting {len(dir_entries)} files")
     try:
-        dir_entries.sort(key=get_exif_date)
-    except EXIFerror as exc:
+        dir_entries.sort(key=get_date)
+    except PermissionError as exc:
         logger.error(exc)
         sys.exit(1)
     logger.debug(f"Sorted files: {dir_entries}")
