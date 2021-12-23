@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - "**.py"
+      - .github/workflows/python-checks.yml
 
 jobs:
   checks:
