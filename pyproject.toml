@@ -36,6 +36,7 @@ flake8 = { version = "~3", optional = true }
 
 [tool.poetry.scripts]
 flickrUploader = "flickrknob.uploader:uploader"
+delete_album = "flickrknob.delete_album:delete_album_with_photos"
 
 [build-system]
 requires = ["poetry>=0.12"]
