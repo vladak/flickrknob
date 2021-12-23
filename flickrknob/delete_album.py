@@ -12,9 +12,9 @@ import argparse
 import logging
 import sys
 
-import flickrapi
 from alive_progress import alive_bar
 from decouple import config
+import flickrapi
 
 from .flickrknob import auth_check, delete_album, delete_photo, get_albums
 from .logutil import get_package_logger

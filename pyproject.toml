@@ -32,7 +32,11 @@ alive_progress = ">=2.0.0"
 # flickrapi = ">=1.0"
 flickrapi = { path="flickrapi" }
 
+[tool.poetry.dev-dependencies]
 flake8 = { version = "~3", optional = true }
+black = {version = "*", allow-prereleases = true}
+isort = "*"
+pylint = "*"
 
 [tool.poetry.scripts]
 flickrUploader = "flickrknob.uploader:uploader"
