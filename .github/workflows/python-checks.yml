@@ -26,16 +26,16 @@ jobs:
       - name: Run flake8
         run: |
           pip install flake8
-          flake8 --ignore=E501 flickrknob/*.py
+          poetry run flake8 --ignore=E501 flickrknob/*.py
       - name: Run pylint
         run: |
           pip install pylint
-          pylint flickrknob/*.py
+          poetry run pylint flickrknob/*.py
       - name: Run black in check mode
         run: |
           pip install black
-          black --check flickrknob/*.py
+          poetry run black --check flickrknob/*.py
       - name: Run isort in check mode
         run: |
           pip install isort
-          isort flickrknob/*.py  --check --diff
+          poetry run isort flickrknob/*.py  --check --diff
