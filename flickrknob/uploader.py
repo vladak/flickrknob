@@ -16,6 +16,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from alive_progress import alive_bar
 from decouple import config
+
 from flickrapi import FlickrAPI, FlickrError
 
 from .flickrknob import auth_check, create_album, get_albums, upload_photo

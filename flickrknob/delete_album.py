@@ -14,6 +14,7 @@ import sys
 
 from alive_progress import alive_bar
 from decouple import config
+
 import flickrapi
 
 from .flickrknob import auth_check, delete_album, delete_photo, get_albums
