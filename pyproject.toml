@@ -33,7 +33,7 @@ alive_progress = ">=2.0.0"
 flickrapi = { path="flickrapi" }
 
 [tool.poetry.dev-dependencies]
-flake8 = { version = "~3", optional = true }
+flake8 = { version = "~3" }
 black = {version = "*", allow-prereleases = true}
 isort = "*"
 pylint = "*"
