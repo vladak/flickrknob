@@ -18,7 +18,8 @@ named `flickrknob`.
 ```
 python3 -m venv env
 . ./env/bin/activate
-python setup.py install
+pip install poetry
+poetry install
 ```
 
 ### Obtain credentials
@@ -37,7 +38,7 @@ Be sure you don't upload this folder or your `.env` file to a public repository.
 ## Run
 
 ```
-flickrUploader.py "album name" "photo directory"
+flickrUploader "album name" "photo directory"
 ```
 
 This will upload photos from the top level of the `photo directory` (i.e. does
