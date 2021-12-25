@@ -7,6 +7,7 @@ on:
       - "**.py"
       - pyproject.toml
       - .github/workflows/codeql-analysis.yml
+      - .github/codeql/codeql-config.yml
   pull_request:
     # The branches below must be a subset of the branches above
     branches: [ main ]
