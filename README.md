@@ -1,3 +1,5 @@
+[![Python checks](https://github.com/vladak/flickrknob/actions/workflows/python-checks.yml/badge.svg)](https://github.com/vladak/flickrknob/actions/workflows/python-checks.yml) [![CodeQL](https://github.com/vladak/flickrknob/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/vladak/flickrknob/actions/workflows/codeql-analysis.yml)
+
 # Alternative Flickr uploader
 
 The [Flickr Uploadr app](https://www.flickr.com/tools/) has a few limitations that make it unusable for my uses
