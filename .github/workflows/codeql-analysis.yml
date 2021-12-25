@@ -46,4 +46,4 @@ jobs:
         languages: ${{ matrix.language }}
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v1
-      paths-ignore: 'flickrapi/**'
+      config-file: ./.github/codeql/codeql-config.yml
