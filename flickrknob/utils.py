@@ -63,5 +63,5 @@ def check_dir(name):
     logger.debug(f"Checking if '{name}' is directory")
 
     if not os.path.isdir(name):
-        logger.critical(f"{name} is not a directory")
+        logger.critical(f"'{name}' is not a directory")
         sys.exit(1)
