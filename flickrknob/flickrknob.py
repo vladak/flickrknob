@@ -57,7 +57,13 @@ def create_album(flickr_handle, title, primary_photo_id):
 
 # pylint: disable=R0913
 def upload_photo(
-    flickr_handle, file_path, title=None, description=None, tags=None, dedup=False
+    flickr_handle,
+    file_path,
+    title=None,
+    description=None,
+    tags=None,
+    dedup=False,
+    retries=0,
 ):
     """
     Upload given file to Flickr. If title is not specified, it will be set
@@ -94,18 +100,27 @@ def upload_photo(
         params["tags"] = tags
 
     with open(file_path, "rb") as file_obj:
-        try:
-            rsp = flickr_handle.upload(file_path, fileobj=file_obj, **params)
-            logger.debug(ElementTree.tostring(rsp, "utf-8"))
-            photo_id = rsp.find("photoid")
-            if photo_id is not None:
-                res = photo_id.text
-                logger.debug(f"Uploaded file '{file_path}' as {res}")
-            else:
+        for i in range(1, retries + 2):
+            try:
+                rsp = flickr_handle.upload(file_path, fileobj=file_obj, **params)
+                logger.debug(ElementTree.tostring(rsp, "utf-8"))
+                photo_id = rsp.find("photoid")
+                if photo_id is not None:
+                    res = photo_id.text
+                    logger.debug(f"Uploaded file '{file_path}' as {res}")
+                    return res
+
                 logger.error(f"Cannot get photo ID for uploaded file '{file_path}")
-        except flickrapi.exceptions.FlickrDuplicate as exc:
-            res = exc.duplicate_photo_id
-            logger.info(f"Duplicate photo '{file_path}' with ID {res}")
+            except flickrapi.exceptions.FlickrDuplicate as exc:
+                res = exc.duplicate_photo_id
+                logger.info(f"Duplicate photo '{file_path}' with ID {res}")
+                return res
+            except flickrapi.exceptions.FlickrError as exc:
+                logger.debug(
+                    f"Failed to upload file '{file_path}' (try {i}/{retries + 1}): {exc}"
+                )
+                if i == retries + 1:
+                    raise exc
 
     return res
 

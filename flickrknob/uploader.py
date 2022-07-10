@@ -29,13 +29,16 @@ flickrKey = config("FLICKR_KEY")
 flickrSecret = config("FLICKR_SECRET")
 
 
-def upload_single_photo(file_path, bar, file_logger, flickr, dedup):
+# pylint: disable=R0913
+def upload_single_photo(file_path, bar, file_logger, flickr, dedup, retries):
     """
     worker function to upload a photo and report progress
     """
 
     file_name = os.path.basename(file_path)
-    photo_id = upload_photo(flickr, file_path, title=file_name, dedup=dedup)
+    photo_id = upload_photo(
+        flickr, file_path, title=file_name, dedup=dedup, retries=retries
+    )
 
     bar()
     file_logger.info(f"Uploaded '{file_path}':{photo_id}")
@@ -73,6 +76,12 @@ def get_args():
         help="Log file to record uploaded files",
         default="files-{album_name}.log",
     )
+    parser.add_argument(
+        "--retries",
+        help="Number of retries when single file upload fails",
+        type=int,
+        default=3,
+    )
     parser.add_argument("--threads", help="Number of threads to create", default=4)
     parser.add_argument("photoset")
     parser.add_argument("sourceDir")
@@ -98,8 +107,8 @@ def check_album_name(album_name, flickr):
         sys.exit(1)
 
 
-# pylint: disable=R0914
-def upload_files(dir_entries, file_logger, flickr, numworkers, dedup):
+# pylint: disable=R0914,R0913
+def upload_files(dir_entries, file_logger, flickr, numworkers, dedup, retries):
     """
     upload files to Flickr
     """
@@ -118,7 +127,13 @@ def upload_files(dir_entries, file_logger, flickr, numworkers, dedup):
                     time.sleep(i * 0.5)
                 futures.append(
                     executor.submit(
-                        upload_single_photo, file_path, bar, file_logger, flickr, dedup
+                        upload_single_photo,
+                        file_path,
+                        bar,
+                        file_logger,
+                        flickr,
+                        dedup,
+                        retries,
                     )
                 )
             for future in as_completed(futures):
@@ -235,7 +250,7 @@ def uploader():
     )
 
     photo_ids, primary_photo_id = upload_files(
-        dir_entries, file_logger, flickr, args.threads, args.dedup
+        dir_entries, file_logger, flickr, args.threads, args.dedup, args.retries
     )
 
     album_id = create_album(
