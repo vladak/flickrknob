@@ -100,11 +100,13 @@ def upload_photo(
             photo_id = rsp.find("photoid")
             if photo_id is not None:
                 res = photo_id.text
+                logger.debug(f"Uploaded file '{file_path}' as {res}")
+            else:
+                logger.error(f"Cannot get photo ID for uploaded file '{file_path}")
         except flickrapi.exceptions.FlickrDuplicate as exc:
             res = exc.duplicate_photo_id
             logger.info(f"Duplicate photo '{file_path}' with ID {res}")
 
-    logger.debug(f"Uploaded '{file_path}' as {res}")
     return res
 
 
