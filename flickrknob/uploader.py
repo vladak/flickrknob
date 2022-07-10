@@ -40,7 +40,7 @@ def upload_single_photo(file_path, bar, file_logger, flickr, dedup):
     bar()
     file_logger.info(f"Uploaded '{file_path}':{photo_id}")
 
-    return (file_name, photo_id)
+    return file_name, photo_id
 
 
 def add_photo_to_album(bar, file_logger, flickr, photo_id, album_id):
