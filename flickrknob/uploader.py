@@ -83,7 +83,7 @@ def get_args():
         default=3,
     )
     parser.add_argument("--threads", help="Number of threads to create", default=4)
-    parser.add_argument("photoset")
+    parser.add_argument("photosetName")
     parser.add_argument("sourceDir")
     args = parse_args(parser)
     return args
@@ -221,7 +221,7 @@ def uploader():
     # in order to create an album, there needs to be at least one photo
     # uploaded to be used as title photo.
     #
-    check_album_name(args.photoset, flickr)
+    check_album_name(args.photosetName, flickr)
 
     # List files in the top level of the directory.
     dir_name = args.sourceDir
@@ -246,7 +246,7 @@ def uploader():
     # Log the photo IDs to a file so that it is easier to recover if something
     # fails during the process.
     file_logger = get_file_logger(
-        args.logfile.format(album_name=args.photoset), __name__
+        args.logfile.format(album_name=args.photosetName), __name__
     )
 
     photo_ids, primary_photo_id = upload_files(
@@ -254,10 +254,10 @@ def uploader():
     )
 
     album_id = create_album(
-        flickr, title=args.photoset, primary_photo_id=primary_photo_id
+        flickr, title=args.photosetName, primary_photo_id=primary_photo_id
     )
     if album_id is None:
-        logger.error(f"Failed to create album '{args.photoset}'")
+        logger.error(f"Failed to create album '{args.photosetName}'")
         sys.exit(1)
 
     add_files_to_album(
