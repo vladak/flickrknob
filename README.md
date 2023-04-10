@@ -11,6 +11,8 @@ cases, namely:
     I want the photos still be present in the created album even though they are duplicate to some photos in the
     photostream.
   - cannot upload videos
+  - retries failed upload operations (which seem to fail in Flickr infrastructure more often than not with HTTP 504 error codes with
+    messages such as *"CloudFront attempted to establish a connection with the origin, ..."*)
 
 In short, there is not enough knobs to turn for me, hence the main module is
 named `flickrknob`.
