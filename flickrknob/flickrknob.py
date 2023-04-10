@@ -99,9 +99,9 @@ def upload_photo(
     if tags is not None:
         params["tags"] = tags
 
-    with open(file_path, "rb") as file_obj:
-        for i in range(1, retries + 2):
-            try:
+    for i in range(1, retries + 2):
+        try:
+            with open(file_path, "rb") as file_obj:
                 rsp = flickr_handle.upload(file_path, fileobj=file_obj, **params)
                 logger.debug(ElementTree.tostring(rsp, "utf-8"))
                 photo_id = rsp.find("photoid")
@@ -111,16 +111,16 @@ def upload_photo(
                     return res
 
                 logger.error(f"Cannot get photo ID for uploaded file '{file_path}")
-            except flickrapi.exceptions.FlickrDuplicate as exc:
-                res = exc.duplicate_photo_id
-                logger.info(f"Duplicate photo '{file_path}' with ID {res}")
-                return res
-            except flickrapi.exceptions.FlickrError as exc:
-                logger.debug(
-                    f"Failed to upload file '{file_path}' (try {i}/{retries + 1}): {exc}"
-                )
-                if i == retries + 1:
-                    raise exc
+        except flickrapi.exceptions.FlickrDuplicate as exc:
+            res = exc.duplicate_photo_id
+            logger.info(f"Duplicate photo '{file_path}' with ID {res}")
+            return res
+        except flickrapi.exceptions.FlickrError as exc:
+            logger.debug(
+                f"Failed to upload file '{file_path}' (try {i}/{retries + 1}): {exc}"
+            )
+            if i == retries + 1:
+                raise exc
 
     return res
 
