@@ -101,6 +101,8 @@ def upload_photo(
 
     for i in range(1, retries + 2):
         try:
+            # Reopen the file with each attempt. This is necessary because the data
+            # the file object might have been already read.
             with open(file_path, "rb") as file_obj:
                 rsp = flickr_handle.upload(file_path, fileobj=file_obj, **params)
                 logger.debug(ElementTree.tostring(rsp, "utf-8"))
