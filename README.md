@@ -22,7 +22,7 @@ named `flickrknob`.
 ```
 python3 -m venv env
 . ./env/bin/activate
-pip install poetry
+python3 -m pip install poetry
 poetry install
 ```
 
