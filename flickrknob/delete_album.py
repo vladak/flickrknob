@@ -4,7 +4,8 @@
 
 This program deletes album along with all photos contained therein.
 
-It is mean really just to aid debugging the flickrUploader.
+It is meant primarily to aid debugging the flickrUploader command,
+however sometimes the upload process fails and it is easier to start from scratch.
 
 """
 
