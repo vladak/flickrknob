@@ -24,8 +24,8 @@ classifiers = [
 qa = ["flake8"]
 
 [tool.poetry.dependencies]
-python = ">=3.6,<4"
-requests = "~2"
+python = ">=3.8,<4"
+requests = ">2.31.0"
 python_decouple = ">=3.4"
 exifread = ">=2.3.2"
 alive_progress = ">=2.0.0"
