@@ -19,6 +19,13 @@ named `flickrknob`.
 
 ## Setup
 
+Checkout the Git submodules:
+```
+git submodule init
+git submodule checkout
+```
+
+Install the package:
 ```
 python3 -m venv env
 . ./env/bin/activate
