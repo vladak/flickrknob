@@ -1,3 +1,3 @@
 [submodule "flickrapi"]
 	path = flickrapi
-	url = https://github.com/sybrenstuvel/flickrapi
+	url = https://github.com/vladak/flickrapi
