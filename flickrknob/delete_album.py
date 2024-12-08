@@ -17,34 +17,13 @@ from decouple import config
 
 import flickrapi
 
-from .flickrknob import auth_check, delete_album, delete_photo, get_albums
+from .flickrknob import auth_check, delete_album, delete_photo, get_albums, get_album_id
 from .logutil import get_package_logger
 from .parserutil import get_base_parser
 from .utils import check_env, confirm, parse_args
 
 flickrKey = config("FLICKR_DELETE_KEY")
 flickrSecret = config("FLICKR_DELETE_SECRET")
-
-
-def get_album_id(flickr, album_name):
-    """
-    return ID for album name
-    """
-
-    logger = logging.getLogger(__name__)
-
-    logger.info("Getting list of albums")
-    albums = get_albums(flickr)
-    if albums is None or len(albums.items()) == 0:
-        logger.error("Empty list of albums")
-        return None
-
-    album_id = albums.get(album_name)
-    if album_id is None:
-        logger.error(f"Did not find album with name '{album_name}'")
-        return None
-
-    return album_id
 
 
 def delete_album_with_photos():

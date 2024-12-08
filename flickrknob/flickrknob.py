@@ -169,3 +169,24 @@ def auth_check(flickr_handle, perms="read"):
 
         # Trade the request token for an access token
         flickr_handle.get_access_token(verifier)
+
+
+def get_album_id(flickr, album_name):
+    """
+    return ID for album name
+    """
+
+    logger = logging.getLogger(__name__)
+
+    logger.info("Getting list of albums")
+    albums = get_albums(flickr)
+    if albums is None or len(albums.items()) == 0:
+        logger.error("Empty list of albums")
+        return None
+
+    album_id = albums.get(album_name)
+    if album_id is None:
+        logger.error(f"Did not find album with name '{album_name}'")
+        return None
+
+    return album_id
