@@ -68,11 +68,11 @@ def delete_album_with_photos():
 
     logger.info(f"Deleting {len(photo_ids)} files")
     cnt = 0
-    with alive_bar(len(photo_ids)) as bar:
+    with alive_bar(len(photo_ids)) as progress_bar:
         for photo_id in photo_ids:
             delete_photo(flickr, photo_id)
             # pylint: disable=E1102
-            bar()
+            progress_bar()
             cnt = cnt + 1
 
     logger.info(f"Deleted {cnt} files")
