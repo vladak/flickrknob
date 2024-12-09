@@ -30,7 +30,7 @@ flickrSecret = config("FLICKR_SECRET")
 
 
 # pylint: disable=R0913
-def upload_single_photo(file_path, bar, file_logger, flickr, dedup, retries):
+def upload_single_photo(file_path, progress_bar, file_logger, flickr, dedup, retries):
     """
     worker function to upload a photo and report progress
     """
@@ -40,13 +40,13 @@ def upload_single_photo(file_path, bar, file_logger, flickr, dedup, retries):
         flickr, file_path, title=file_name, dedup=dedup, retries=retries
     )
 
-    bar()
+    progress_bar()
     file_logger.info(f"Uploaded '{file_path}':{photo_id}")
 
     return file_name, photo_id
 
 
-def add_photo_to_album(bar, file_logger, flickr, photo_id, album_id):
+def add_photo_to_album(progress_bar, file_logger, flickr, photo_id, album_id):
     """
     worker function to add photo to album and report progress
     """
@@ -55,7 +55,7 @@ def add_photo_to_album(bar, file_logger, flickr, photo_id, album_id):
 
     logger.debug(f"Adding file {photo_id} to album {album_id}")
     flickr.photosets.addPhoto(photoset_id=album_id, photo_id=photo_id)
-    bar()
+    progress_bar()
     file_logger.info(f"Added {photo_id} to album {album_id}")
 
 
@@ -117,7 +117,7 @@ def upload_files(dir_entries, file_logger, flickr, numworkers, dedup, retries):
     logger.info(f"Uploading {len(dir_entries)} files")
     photo_ids = {}
     primary_photo_id = None
-    with alive_bar(len(dir_entries)) as bar:
+    with alive_bar(len(dir_entries)) as progress_bar:
         with ThreadPoolExecutor(max_workers=numworkers) as executor:
             futures = []
             for i, file_path in enumerate(dir_entries):
@@ -129,7 +129,7 @@ def upload_files(dir_entries, file_logger, flickr, numworkers, dedup, retries):
                     executor.submit(
                         upload_single_photo,
                         file_path,
-                        bar,
+                        progress_bar,
                         file_logger,
                         flickr,
                         dedup,
@@ -161,7 +161,7 @@ def add_files_to_album(
     logger = logging.getLogger(__name__)
 
     logger.info(f"Adding files to album {album_id}")
-    with alive_bar(len(photo_ids.keys()) - 1) as bar:
+    with alive_bar(len(photo_ids.keys()) - 1) as progress_bar:
         with ThreadPoolExecutor(max_workers=numworkers) as executor:
             futures = []
             for photo_id in photo_ids.values():
@@ -172,7 +172,12 @@ def add_files_to_album(
 
                 futures.append(
                     executor.submit(
-                        add_photo_to_album, bar, file_logger, flickr, photo_id, album_id
+                        add_photo_to_album,
+                        progress_bar,
+                        file_logger,
+                        flickr,
+                        photo_id,
+                        album_id,
                     )
                 )
 
