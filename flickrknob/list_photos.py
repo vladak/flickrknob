@@ -7,18 +7,16 @@ This program lists all photos in given album.
 """
 
 import argparse
-import logging
 import sys
 
-from alive_progress import alive_bar
 from decouple import config
 
 import flickrapi
 
-from .flickrknob import auth_check, delete_album, delete_photo, get_albums, get_album_id
+from .flickrknob import auth_check, get_album_id
 from .logutil import get_package_logger
 from .parserutil import get_base_parser
-from .utils import check_env, confirm, parse_args
+from .utils import check_env, parse_args
 
 flickrKey = config("FLICKR_KEY")
 flickrSecret = config("FLICKR_SECRET")
