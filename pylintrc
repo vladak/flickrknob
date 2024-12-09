@@ -1,3 +1,4 @@
 [MESSAGES CONTROL]
 
-disable=duplicate-code
+disable=duplicate-code,
+	logging-fstring-interpolation
