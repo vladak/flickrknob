@@ -237,6 +237,10 @@ def uploader():
         if os.path.isfile(os.path.join(dir_name, f)) and is_known_suffix(f)
     ]
 
+    if len(dir_entries) == 0:
+        logger.info("No files to upload, exiting")
+        sys.exit(0)
+
     # Sort the files according to the (EXIF) date.
     # This serves also as prevention for file related problems in the upload
     # phase (except this is still a TOCTOU problem).
